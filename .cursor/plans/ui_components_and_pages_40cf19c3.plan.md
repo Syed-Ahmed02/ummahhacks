@@ -32,6 +32,21 @@ todos:
   - id: polish-ui
     content: Add loading states, error handling, and responsive design polish
     status: pending
+  - id: charity-map-component
+    content: Create CharityProjectsMap component using Map component to display recent charity projects
+    status: pending
+  - id: geocoding-utils
+    content: Set up geocoding utilities to convert charity addresses to map coordinates
+    status: pending
+  - id: dashboard-map-integration
+    content: Integrate CharityProjectsMap into dashboard page
+    status: pending
+  - id: report-map-integration
+    content: Add map view to report detail pages showing charities for that week
+    status: pending
+  - id: admin-map-integration
+    content: Add map views to admin charity management pages
+    status: pending
 isProject: false
 ---
 
@@ -92,6 +107,7 @@ Main user dashboard showing:
 - Subscription status card
 - Impact statistics
 - Recent distributions
+- **Charity Projects Map** - Visual map of recent charity projects
 - Quick actions
 
 ### File: `components/dashboard/StatsCard.tsx`
@@ -148,6 +164,7 @@ Individual report detail page:
 - Week date range
 - Total distributed
 - Distribution breakdown
+- **Map view of charities for this week** - Interactive map showing all charities that received funds
 - Charity details
 - AI explanations
 - Impact metrics
@@ -176,6 +193,16 @@ Impact metrics display:
 - Lives impacted (estimated)
 - Meals provided (estimated)
 - Other impact calculations
+
+### File: `components/reports/ReportMap.tsx`
+
+Map component for report detail page:
+
+- Shows all charities that received distributions in the report
+- Uses MapClusterLayer for clustering
+- Each marker shows charity name and amount
+- Click to view charity details
+- Toggle between map and list view
 
 ## Subscription Pages
 
@@ -215,6 +242,16 @@ Charity detail/approval page:
 - Edit charity details
 - View needs data
 - View distribution history
+- **Map showing charity location** - Visual confirmation of charity location
+
+### File: `app/(dashboard)/admin/charities/map/page.tsx`
+
+Admin map view of all charities:
+
+- Overview map of all approved charities
+- Filter by status, category, city
+- See distribution patterns geographically
+- Useful for identifying coverage gaps
 
 ### File: `components/admin/CharityForm.tsx`
 
@@ -279,6 +316,59 @@ Loading state component.
 
 Error boundary for graceful error handling.
 
+## Map Components
+
+### File: `components/map/CharityProjectsMap.tsx`
+
+Main map component for displaying charity projects:
+
+**Props:**
+
+- `charities`: Array of charity data with coordinates
+- `distributions`: Optional distribution data to show amounts
+- `timeRange`: Filter by time period
+- `onCharityClick`: Callback when charity marker is clicked
+- `height`: Map height (default: 400px)
+
+**Features:**
+
+- Converts charity addresses to coordinates (geocoding)
+- Uses MapClusterLayer for performance with many markers
+- Custom marker styling based on category or urgency
+- Responsive design
+
+### File: `components/map/CharityMarker.tsx`
+
+Custom marker component for individual charities:
+
+- Custom icon based on category
+- Color based on urgency or funding gap
+- Shows amount received on hover
+- Click to open popup with details
+
+### File: `components/map/CharityPopup.tsx`
+
+Popup content for charity markers:
+
+- Charity name and logo
+- Category badge
+- Total amount received
+- Number of distributions
+- Urgency score (if available)
+- Link to charity detail page
+- Quick actions (view details, view needs)
+
+### File: `lib/geocoding.ts`
+
+Geocoding utilities:
+
+- Convert addresses to lat/lng coordinates
+- Cache geocoded results
+- Handle geocoding errors gracefully
+- Use geocoding service (e.g., Mapbox Geocoding API, Google Geocoding)
+
+**Note:** For MVP, can use a geocoding service or store coordinates in charity records when created.
+
 ## Navigation
 
 ### File: `components/navigation/DashboardNav.tsx`
@@ -323,16 +413,23 @@ Dashboard layout wrapper:
 - Requires Convex plan for data queries
 - Requires Stripe plan for subscription UI
 - Uses existing shadcn/ui component library
+- Uses Map component from `components/ui/map.tsx` (MapLibre GL-based)
+- May require geocoding service for address-to-coordinates conversion
 
 ## Implementation Steps
 
 1. Redesign landing page with hero and features
 2. Create dashboard layout and navigation
 3. Build main dashboard page with stats and recent activity
-4. Create reports list and detail pages
-5. Build admin charity management pages
-6. Create admin needs management page
-7. Create shared reusable components
-8. Add loading and error states
-9. Implement responsive design
-10. Polish UI/UX and add animations
+4. **Create CharityProjectsMap component with Map integration**
+5. **Set up geocoding utilities for address-to-coordinates**
+6. **Integrate map into dashboard showing recent charity projects**
+7. Create reports list and detail pages
+8. **Add map view to report detail pages**
+9. Build admin charity management pages
+10. **Add map view to admin charity pages**
+11. Create admin needs management page
+12. Create shared reusable components
+13. Add loading and error states
+14. Implement responsive design
+15. Polish UI/UX and add animations

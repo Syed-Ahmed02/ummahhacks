@@ -28,6 +28,8 @@ todos:
     status: pending
   - id: scheduled-jobs
     content: Create convex/scheduled.ts with weekly cron jobs for distribution and reports
+  - id: charity-coordinates
+    content: Add latitude/longitude fields to charity schema and functions for map integration
     status: pending
 isProject: false
 ---
@@ -76,6 +78,8 @@ Define all tables with proper types:
 - `city`: string
 - `state`: string
 - `zipCode`: string
+- `latitude`: number | null (for map display)
+- `longitude`: number | null (for map display)
 - `category`: string
 - `verificationStatus`: "pending" | "approved" | "rejected"
 - `adminNotes`: string | null
@@ -150,6 +154,8 @@ Define all tables with proper types:
 - `rejectCharity` (mutation) - Reject charity (admin only)
 - `getCharity` (query) - Get single charity
 - `getCharitiesByCity` (query) - Get approved charities in a city
+- `getCharitiesWithCoordinates` (query) - Get charities with valid coordinates for map display
+- `updateCharityCoordinates` (mutation) - Update latitude/longitude (for geocoding)
 - `getPendingCharities` (query) - Get pending charities (admin)
 - `getAllCharities` (query) - Get all charities with filters
 
@@ -251,4 +257,6 @@ CONVEX_DEPLOYMENT=
 7. Create `convex/reports.ts` with report generation functions
 8. Create `convex/portfolioManager.ts` with distribution algorithm
 9. Create `convex/scheduled.ts` with cron jobs
-10. Test all functions with Convex dashboard
+10. Add coordinate fields to charity schema for map integration
+11. Add functions to update and query charity coordinates
+12. Test all functions with Convex dashboard
