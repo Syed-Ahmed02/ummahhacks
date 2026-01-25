@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
@@ -49,6 +49,7 @@ export default function SubmitBillPage() {
   );
 
   const submitBill = useMutation(api.bills.submitBill);
+  const triggerVerification = useAction(api.ai.triggerVerification);
 
   // Form state
   const [step, setStep] = useState<Step>("utility");
@@ -158,7 +159,7 @@ export default function SubmitBillPage() {
     setError(null);
 
     try {
-      await submitBill({
+      const billId = await submitBill({
         userId: convexUser._id,
         poolId: userPool._id,
         utilityType,
@@ -169,6 +170,9 @@ export default function SubmitBillPage() {
         shutoffDate: new Date(shutoffDate).getTime(),
         documentStorageId: storageId,
       });
+
+      // Trigger AI verification asynchronously (don't block on it)
+      triggerVerification({ billId }).catch(console.error);
 
       setStep("success");
     } catch (err) {
