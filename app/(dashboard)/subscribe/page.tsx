@@ -67,9 +67,9 @@ export default function SubscribePage() {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="font-semibold text-foreground text-2xl">Start investing</h1>
+        <h1 className="font-semibold text-foreground text-2xl">Start contributing</h1>
         <p className="text-muted-foreground mt-1">
-          Choose your weekly amount. Your subscription will automatically distribute funds to local charities.
+          Choose a weekly amount to support your community. You can update it anytime.
         </p>
       </div>
       <Card className="border-border">

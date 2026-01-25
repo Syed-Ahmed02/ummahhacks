@@ -1,40 +1,23 @@
 "use client";
 
-import {
-  CreditCard,
-  Brain,
-  Zap,
-  FileBarChart,
-} from "lucide-react";
-
 const steps = [
   {
     step: 1,
-    title: "Subscribe for a weekly amount",
+    title: "Subscribe Weekly",
     description:
-      "Choose how much you want to give each week. No commitment beyond that—pause or cancel anytime.",
-    icon: CreditCard,
+      "Choose how much you want to contribute each week. Starting at $5/week, you can pause or cancel anytime.",
   },
   {
     step: 2,
-    title: "AI monitors community needs",
+    title: "AI Verifies Bills",
     description:
-      "Our system tracks urgency, funding gaps, and local data to identify where help is needed most.",
-    icon: Brain,
+      "When a neighbor submits a utility bill, our AI verifies it's legitimate. No fake requests slip through.",
   },
   {
     step: 3,
-    title: "Funds distributed automatically",
+    title: "Direct Payment",
     description:
-      "Your contribution is allocated across vetted local charities. No extra work—just set it and forget it.",
-    icon: Zap,
-  },
-  {
-    step: 4,
-    title: "Receive your weekly impact report",
-    description:
-      "See exactly where your money went, how many people were helped, and stories from the ground.",
-    icon: FileBarChart,
+      "We pay the utility company directly. No cash goes to the recipient. 100% of your contribution covers bills.",
   },
 ];
 
@@ -42,7 +25,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="border-t border-border bg-muted/30 px-4 py-16 sm:px-6 sm:py-24 lg:px-8"
+      className="border-t border-border px-4 py-20 sm:px-6 sm:py-28 lg:px-8"
       aria-labelledby="how-it-works-heading"
     >
       <div className="mx-auto max-w-5xl">
@@ -53,24 +36,21 @@ export function HowItWorks() {
           How it works
         </h2>
         <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-center text-lg">
-          Four simple steps to meaningful, ongoing impact.
+          Three simple steps to keep your community powered.
         </p>
-        <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map(({ step, title, description, icon: Icon }) => (
+        <ol className="mt-12 grid gap-10 sm:grid-cols-3">
+          {steps.map(({ step, title, description }) => (
             <li
               key={step}
               className="relative flex flex-col"
             >
               <span
-                className="bg-primary text-primary-foreground inline-flex size-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+                className="inline-flex size-10 shrink-0 items-center justify-center rounded-full border border-border text-sm font-semibold text-foreground"
                 aria-hidden
               >
                 {step}
               </span>
-              <div className="mt-4 flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background">
-                <Icon className="text-muted-foreground size-5" aria-hidden />
-              </div>
-              <h3 className="font-semibold text-foreground mt-3 text-base">
+              <h3 className="font-semibold text-foreground mt-4 text-base">
                 {title}
               </h3>
               <p className="text-muted-foreground mt-1 flex-1 text-sm leading-relaxed">

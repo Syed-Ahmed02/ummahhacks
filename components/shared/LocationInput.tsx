@@ -73,13 +73,13 @@ export function LocationInput({
         <Field>
           {showLabels && (
             <FieldLabel>
-              <Label htmlFor="location-state">State</Label>
+              <Label htmlFor="location-state">Province</Label>
               {required && <span className="text-destructive"> *</span>}
             </FieldLabel>
           )}
           <Input
             id="location-state"
-            placeholder="State"
+            placeholder="Province"
             value={value.state}
             onChange={handleChange("state")}
             disabled={disabled}
@@ -90,13 +90,13 @@ export function LocationInput({
         <Field>
           {showLabels && (
             <FieldLabel>
-              <Label htmlFor="location-zip">ZIP</Label>
+              <Label htmlFor="location-zip">Postal Code</Label>
               {required && <span className="text-destructive"> *</span>}
             </FieldLabel>
           )}
           <Input
             id="location-zip"
-            placeholder="ZIP"
+            placeholder="Postal Code"
             value={value.zip}
             onChange={handleChange("zip")}
             disabled={disabled}
