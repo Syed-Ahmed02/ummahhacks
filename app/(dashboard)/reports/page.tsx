@@ -3,6 +3,7 @@
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 import { redirect } from "next/navigation";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -74,7 +75,7 @@ export default function ReportsListPage() {
   }
 
   // Utility breakdown for display
-  const utilityBreakdown = aggregateStats?.utilityBreakdown ?? {};
+  const utilityBreakdown: Record<string, number> = aggregateStats?.utilityBreakdown ?? {};
   const utilityTypes = Object.entries(utilityBreakdown).sort((a, b) => b[1] - a[1]);
 
   return (
@@ -165,7 +166,7 @@ export default function ReportsListPage() {
         </h2>
         {reports && reports.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {reports.map((report) => (
+            {reports.map((report: Doc<"impactReports">) => (
               <ReportCard key={report._id} report={report as any} />
             ))}
           </div>

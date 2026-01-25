@@ -19,8 +19,9 @@ export type CombinedUser = {
   // Convex data
   convexId: string | null;
   city: string | null;
-  state: string | null;
-  zipCode: string | null;
+  province: string | null;
+  postalCode: string | null;
+  role: "contributor" | "recipient" | null;
   createdAt: number | null;
   hasCompletedOnboarding: boolean;
 };
@@ -56,8 +57,9 @@ export function useUser() {
         // Convex data
         convexId: convexUser?._id ?? null,
         city: convexUser?.city ?? null,
-        state: convexUser?.state ?? null,
-        zipCode: convexUser?.zipCode ?? null,
+        province: convexUser?.province ?? null,
+        postalCode: convexUser?.postalCode ?? null,
+        role: convexUser?.role ?? null,
         createdAt: convexUser?.createdAt ?? null,
         hasCompletedOnboarding: !!convexUser,
       }

@@ -10,6 +10,27 @@
 import { action } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
+
+type VerifyBillResult = {
+  success: boolean;
+  analysis?: {
+    authenticityScore: number;
+    urgencyLevel: "critical" | "high" | "medium";
+    extractedData: {
+      provider: string;
+      amount: number;
+      dueDate: string;
+      accountNumber: string;
+      customerName: string;
+      serviceAddress: string;
+    };
+    flaggedIssues: string[];
+    recommendation: "approve" | "reject" | "manual_review";
+  };
+  verificationStatus?: "verified" | "rejected" | "needs_review";
+  error?: string;
+};
 
 /**
  * Verify a bill using AI and update the database with results.
@@ -24,7 +45,7 @@ export const verifyBill = action({
   args: {
     billId: v.id("billSubmissions"),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<VerifyBillResult> => {
     // First, update status to "analyzing"
     await ctx.runMutation(api.bills.updateVerificationStatus, {
       billId: args.billId,

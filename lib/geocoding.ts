@@ -49,7 +49,7 @@ export async function geocodeAddress(address: {
   };
 
   const lookup = [address.city, address.state, address.zip].filter(Boolean).join(", ").toLowerCase().replace(/\s+/g, " ").trim();
-  let result = staticMap[lookup] ?? null;
+  let result: GeocodeResult | null = staticMap[lookup] ?? null;
   if (!result && address.city && address.state) {
     const cityState = `${address.city}, ${address.state}`.toLowerCase();
     result = Object.entries(staticMap).find(([k]) => k.startsWith(cityState))?.[1] ?? null;

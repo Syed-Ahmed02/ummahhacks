@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,8 @@ import {
 } from "lucide-react";
 
 type VerificationStatus = "pending" | "analyzing" | "verified" | "rejected" | "needs_review";
+type UtilityType = "electric" | "water" | "gas" | "heating";
+type UrgencyLevel = "critical" | "high" | "medium";
 
 const statusFilters: { value: VerificationStatus | "all"; label: string }[] = [
   { value: "needs_review", label: "Needs Review" },
@@ -31,14 +34,14 @@ const statusFilters: { value: VerificationStatus | "all"; label: string }[] = [
   { value: "all", label: "All Bills" },
 ];
 
-const utilityIcons = {
+const utilityIcons: Record<UtilityType, typeof Zap> = {
   electric: Zap,
   water: Droplets,
   gas: Flame,
   heating: Thermometer,
 };
 
-const urgencyConfig = {
+const urgencyConfig: Record<UrgencyLevel, { color: string; label: string; textColor: string }> = {
   critical: { color: "bg-red-500", label: "Critical", textColor: "text-red-700" },
   high: { color: "bg-orange-500", label: "High", textColor: "text-orange-700" },
   medium: { color: "bg-yellow-500", label: "Medium", textColor: "text-yellow-700" },
@@ -123,9 +126,9 @@ export default function AdminBillsPage() {
         </div>
       ) : bills && bills.length > 0 ? (
         <div className="space-y-4">
-          {bills.map((bill) => {
+          {bills.map((bill: Doc<"billSubmissions">) => {
             const UtilityIcon = utilityIcons[bill.utilityType];
-            const urgency = bill.aiAnalysis?.urgencyLevel ?? getUrgencyLevel(bill.shutoffDate);
+            const urgency: UrgencyLevel = bill.aiAnalysis?.urgencyLevel ?? getUrgencyLevel(bill.shutoffDate);
             const urgencyStyle = urgencyConfig[urgency];
             const daysUntil = getDaysUntilShutoff(bill.shutoffDate);
 

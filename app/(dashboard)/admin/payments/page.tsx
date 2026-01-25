@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { useUser } from "@clerk/nextjs";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { Id, Doc } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -28,8 +28,9 @@ import {
 } from "lucide-react";
 
 type PaymentMethod = "cheque" | "bank_transfer" | "online";
+type UtilityType = "electric" | "water" | "gas" | "heating";
 
-const utilityIcons = {
+const utilityIcons: Record<UtilityType, typeof Zap> = {
   electric: Zap,
   water: Droplets,
   gas: Flame,
@@ -134,7 +135,7 @@ export default function AdminPaymentsPage() {
 
         {billsAwaitingPayment && billsAwaitingPayment.length > 0 ? (
           <div className="space-y-4">
-            {billsAwaitingPayment.map((bill) => {
+            {billsAwaitingPayment.map((bill: Doc<"billSubmissions">) => {
               const UtilityIcon = utilityIcons[bill.utilityType];
               const daysUntil = getDaysUntilShutoff(bill.shutoffDate);
               const isSelected = selectedBill === bill._id;
@@ -280,7 +281,7 @@ export default function AdminPaymentsPage() {
           <Card>
             <CardContent className="p-0">
               <div className="divide-y">
-                {recentPayments.map((payment) => {
+                {recentPayments.map((payment: Doc<"payments">) => {
                   const MethodIcon = paymentMethodIcons[payment.paymentMethod];
 
                   return (

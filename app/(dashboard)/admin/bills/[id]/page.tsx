@@ -33,14 +33,18 @@ import {
   ZoomIn,
 } from "lucide-react";
 
-const utilityIcons = {
+type UtilityType = "electric" | "water" | "gas" | "heating";
+
+const utilityIcons: Record<UtilityType, typeof Zap> = {
   electric: Zap,
   water: Droplets,
   gas: Flame,
   heating: Thermometer,
 };
 
-const urgencyConfig = {
+type UrgencyLevel = "critical" | "high" | "medium";
+
+const urgencyConfig: Record<UrgencyLevel, { color: string; label: string; textColor: string; bgLight: string }> = {
   critical: { color: "bg-red-500", label: "Critical (<7 days)", textColor: "text-red-700", bgLight: "bg-red-50" },
   high: { color: "bg-orange-500", label: "High (<14 days)", textColor: "text-orange-700", bgLight: "bg-orange-50" },
   medium: { color: "bg-yellow-500", label: "Medium (>14 days)", textColor: "text-yellow-700", bgLight: "bg-yellow-50" },
@@ -52,7 +56,7 @@ function getDaysUntilShutoff(shutoffDate: number): number {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
-function getUrgencyLevel(shutoffDate: number): "critical" | "high" | "medium" {
+function getUrgencyLevel(shutoffDate: number): UrgencyLevel {
   const days = getDaysUntilShutoff(shutoffDate);
   if (days <= 7) return "critical";
   if (days <= 14) return "high";
@@ -127,8 +131,8 @@ export default function BillReviewDetailPage() {
     );
   }
 
-  const UtilityIcon = utilityIcons[bill.utilityType];
-  const urgency = bill.aiAnalysis?.urgencyLevel ?? getUrgencyLevel(bill.shutoffDate);
+  const UtilityIcon = utilityIcons[bill.utilityType as UtilityType];
+  const urgency: UrgencyLevel = (bill.aiAnalysis?.urgencyLevel as UrgencyLevel | undefined) ?? getUrgencyLevel(bill.shutoffDate);
   const urgencyStyle = urgencyConfig[urgency];
   const daysUntil = getDaysUntilShutoff(bill.shutoffDate);
   const isAlreadyReviewed = bill.verificationStatus === "verified" || bill.verificationStatus === "rejected";
@@ -358,7 +362,7 @@ export default function BillReviewDetailPage() {
                       Flagged Issues
                     </h4>
                     <ul className="space-y-2">
-                      {bill.aiAnalysis.flaggedIssues.map((issue, idx) => (
+                      {bill.aiAnalysis.flaggedIssues.map((issue: string, idx: number) => (
                         <li
                           key={idx}
                           className="text-sm bg-yellow-50 text-yellow-800 px-3 py-2 rounded-lg"

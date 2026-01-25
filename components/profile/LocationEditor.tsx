@@ -29,8 +29,8 @@ export function LocationEditor({ userId, initialData, onSuccess }: LocationEdito
       await updateUser({
         userId,
         city: data.city,
-        state: data.state,
-        zipCode: data.zipCode,
+        province: data.province,
+        postalCode: data.postalCode,
       });
 
       setSuccess(true);
@@ -51,7 +51,7 @@ export function LocationEditor({ userId, initialData, onSuccess }: LocationEdito
       <CardHeader>
         <h2 className="font-medium text-foreground">Location</h2>
         <p className="text-sm text-muted-foreground">
-          Update your location to see charities in your area.
+          Update your location to connect with your community pool.
         </p>
       </CardHeader>
       <CardContent>

@@ -2,6 +2,7 @@
 
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, CANADIAN_PROVINCES } from "@/lib/constants/canada";
@@ -14,6 +15,8 @@ import {
   MapPin,
   Building2,
 } from "lucide-react";
+
+type Pool = Doc<"communityPools">;
 
 function getProvinceName(code: string): string {
   const province = CANADIAN_PROVINCES.find((p) => p.code === code);
@@ -44,11 +47,11 @@ export default function AdminPoolsPage() {
   const aggregateStats = pools
     ? {
         totalPools: pools.length,
-        totalContributors: pools.reduce((sum, p) => sum + p.totalContributors, 0),
-        totalFundsAvailable: pools.reduce((sum, p) => sum + p.totalFundsAvailable, 0),
-        totalFamiliesHelped: pools.reduce((sum, p) => sum + p.totalFamiliesHelped, 0),
-        totalDistributed: pools.reduce((sum, p) => sum + p.totalAmountDistributed, 0),
-        weeklyContributions: pools.reduce((sum, p) => sum + p.weeklyContributions, 0),
+        totalContributors: pools.reduce((sum: number, p: Pool) => sum + p.totalContributors, 0),
+        totalFundsAvailable: pools.reduce((sum: number, p: Pool) => sum + p.totalFundsAvailable, 0),
+        totalFamiliesHelped: pools.reduce((sum: number, p: Pool) => sum + p.totalFamiliesHelped, 0),
+        totalDistributed: pools.reduce((sum: number, p: Pool) => sum + p.totalAmountDistributed, 0),
+        weeklyContributions: pools.reduce((sum: number, p: Pool) => sum + p.weeklyContributions, 0),
       }
     : null;
 
@@ -129,8 +132,8 @@ export default function AdminPoolsPage() {
           ) : pools && pools.length > 0 ? (
             <div className="space-y-4">
               {pools
-                .sort((a, b) => b.totalFundsAvailable - a.totalFundsAvailable)
-                .map((pool) => {
+                .sort((a: Pool, b: Pool) => b.totalFundsAvailable - a.totalFundsAvailable)
+                .map((pool: Pool) => {
                   const health = getPoolHealth(pool);
                   return (
                     <div

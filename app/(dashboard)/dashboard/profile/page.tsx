@@ -85,8 +85,8 @@ export default function ProfilePage() {
         userId={convexUser._id}
         initialData={{
           city: convexUser.city,
-          state: convexUser.state,
-          zipCode: convexUser.zipCode,
+          province: convexUser.province,
+          postalCode: convexUser.postalCode,
         }}
       />
     </div>
