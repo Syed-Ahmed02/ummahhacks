@@ -8,10 +8,10 @@
  * @module
  */
 
-import type * as charities from "../charities.js";
-import type * as distributions from "../distributions.js";
-import type * as needs from "../needs.js";
-import type * as reports from "../reports.js";
+import type * as bills from "../bills.js";
+import type * as impact from "../impact.js";
+import type * as payments from "../payments.js";
+import type * as pools from "../pools.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
 
@@ -22,10 +22,10 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  charities: typeof charities;
-  distributions: typeof distributions;
-  needs: typeof needs;
-  reports: typeof reports;
+  bills: typeof bills;
+  impact: typeof impact;
+  payments: typeof payments;
+  pools: typeof pools;
   subscriptions: typeof subscriptions;
   users: typeof users;
 }>;

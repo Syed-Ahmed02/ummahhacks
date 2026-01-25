@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Shield } from "lucide-react";
 
 export function Hero() {
   return (
@@ -12,25 +12,25 @@ export function Hero() {
     >
       <div className="mx-auto max-w-4xl text-center">
         <p className="text-primary mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium">
-          <Sparkles className="size-4" aria-hidden />
-          Community-first giving
+          <Shield className="size-4" aria-hidden />
+          Neighborhood utility insurance
         </p>
         <h1
           id="hero-heading"
           className="font-semibold tracking-tight text-foreground text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
         >
-          Don&apos;t just donate. Invest where your community needs it most.
+          Keep Your Neighbors&apos; Lights On
         </h1>
         <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg sm:text-xl">
-          Subscribe once. Our AI monitors local needs, distributes funds automatically, and you get a clear impact report every week.
+          Subscribe weekly. When a neighbor can&apos;t pay their utility bill, our AI verifies the need and we pay the provider directly. No cash changes hands.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button render={<Link href="/subscribe" />} nativeButton={false} size="lg" className="gap-2 text-base">
-            Start Investing
+            Start Contributing
             <ArrowRight className="size-4" aria-hidden />
           </Button>
-          <Button render={<Link href="#how-it-works" />} nativeButton={false} variant="outline" size="lg" className="text-base">
-            Learn More
+          <Button render={<Link href="/request-help" />} nativeButton={false} variant="outline" size="lg" className="text-base">
+            I Need Help
           </Button>
         </div>
       </div>

@@ -3,38 +3,30 @@
 import {
   CreditCard,
   Brain,
-  Zap,
-  FileBarChart,
+  Banknote,
 } from "lucide-react";
 
 const steps = [
   {
     step: 1,
-    title: "Subscribe for a weekly amount",
+    title: "Subscribe Weekly",
     description:
-      "Choose how much you want to give each week. No commitment beyond that—pause or cancel anytime.",
+      "Choose how much you want to contribute each week. Starting at $5/week, you can pause or cancel anytime.",
     icon: CreditCard,
   },
   {
     step: 2,
-    title: "AI monitors community needs",
+    title: "AI Verifies Bills",
     description:
-      "Our system tracks urgency, funding gaps, and local data to identify where help is needed most.",
+      "When a neighbor submits a utility bill, our AI verifies it's legitimate. No fake requests slip through.",
     icon: Brain,
   },
   {
     step: 3,
-    title: "Funds distributed automatically",
+    title: "Direct Payment",
     description:
-      "Your contribution is allocated across vetted local charities. No extra work—just set it and forget it.",
-    icon: Zap,
-  },
-  {
-    step: 4,
-    title: "Receive your weekly impact report",
-    description:
-      "See exactly where your money went, how many people were helped, and stories from the ground.",
-    icon: FileBarChart,
+      "We pay the utility company directly. No cash goes to the recipient. 100% of your contribution covers bills.",
+    icon: Banknote,
   },
 ];
 
@@ -53,9 +45,9 @@ export function HowItWorks() {
           How it works
         </h2>
         <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-center text-lg">
-          Four simple steps to meaningful, ongoing impact.
+          Three simple steps to keep your community powered.
         </p>
-        <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-12 grid gap-8 sm:grid-cols-3">
           {steps.map(({ step, title, description, icon: Icon }) => (
             <li
               key={step}

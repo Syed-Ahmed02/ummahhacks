@@ -9,8 +9,9 @@ export const createUser = mutation({
     clerkId: v.string(),
     email: v.string(),
     city: v.string(),
-    state: v.string(),
-    zipCode: v.string(),
+    province: v.string(),
+    postalCode: v.string(),
+    role: v.union(v.literal("contributor"), v.literal("recipient")),
   },
   handler: async (ctx, args) => {
     // Check if user already exists
@@ -28,8 +29,9 @@ export const createUser = mutation({
       clerkId: args.clerkId,
       email: args.email,
       city: args.city,
-      state: args.state,
-      zipCode: args.zipCode,
+      province: args.province,
+      postalCode: args.postalCode,
+      role: args.role,
       createdAt: now,
       updatedAt: now,
     });
@@ -45,9 +47,10 @@ export const updateUser = mutation({
   args: {
     userId: v.id("users"),
     city: v.optional(v.string()),
-    state: v.optional(v.string()),
-    zipCode: v.optional(v.string()),
+    province: v.optional(v.string()),
+    postalCode: v.optional(v.string()),
     email: v.optional(v.string()),
+    role: v.optional(v.union(v.literal("contributor"), v.literal("recipient"))),
   },
   handler: async (ctx, args) => {
     const user = await ctx.db.get(args.userId);
@@ -57,18 +60,20 @@ export const updateUser = mutation({
 
     const updates: {
       city?: string;
-      state?: string;
-      zipCode?: string;
+      province?: string;
+      postalCode?: string;
       email?: string;
+      role?: "contributor" | "recipient";
       updatedAt: number;
     } = {
       updatedAt: Date.now(),
     };
 
     if (args.city !== undefined) updates.city = args.city;
-    if (args.state !== undefined) updates.state = args.state;
-    if (args.zipCode !== undefined) updates.zipCode = args.zipCode;
+    if (args.province !== undefined) updates.province = args.province;
+    if (args.postalCode !== undefined) updates.postalCode = args.postalCode;
     if (args.email !== undefined) updates.email = args.email;
+    if (args.role !== undefined) updates.role = args.role;
 
     await ctx.db.patch(args.userId, updates);
     return await ctx.db.get(args.userId);
@@ -114,5 +119,35 @@ export const getUserByEmail = query({
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
+  },
+});
+
+/**
+ * Get users by role
+ */
+export const getUsersByRole = query({
+  args: {
+    role: v.union(v.literal("contributor"), v.literal("recipient")),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_role", (q) => q.eq("role", args.role))
+      .collect();
+  },
+});
+
+/**
+ * Get users by city
+ */
+export const getUsersByCity = query({
+  args: {
+    city: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_city", (q) => q.eq("city", args.city))
+      .collect();
   },
 });

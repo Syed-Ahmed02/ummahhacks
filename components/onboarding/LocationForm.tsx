@@ -8,8 +8,8 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 export type LocationFormData = {
   city: string;
-  state: string;
-  zipCode: string;
+  province: string;
+  postalCode: string;
 };
 
 type LocationFormProps = {
@@ -29,14 +29,14 @@ export function LocationForm({
 }: LocationFormProps) {
   // Initialize state from initialData if available
   const [geolocationState, setGeolocationState] = useState<GeolocationState>(() => {
-    return initialData?.city && initialData?.state ? "success" : "idle";
+    return initialData?.city && initialData?.province ? "success" : "idle";
   });
   const [locationData, setLocationData] = useState<LocationFormData | null>(() => {
-    if (initialData?.city && initialData?.state) {
+    if (initialData?.city && initialData?.province) {
       return {
         city: initialData.city,
-        state: initialData.state,
-        zipCode: initialData.zipCode || "",
+        province: initialData.province,
+        postalCode: initialData.postalCode || "",
       };
     }
     return null;
@@ -68,8 +68,8 @@ export function LocationForm({
 
           setLocationData({
             city: address.city,
-            state: address.state,
-            zipCode: address.zipCode || "",
+            province: address.state, // reverseGeocode returns state, we use it as province
+            postalCode: address.zipCode || "",
           });
           setGeolocationState("success");
         } catch (err) {
@@ -146,8 +146,8 @@ export function LocationForm({
             <div>
               <p className="text-sm font-medium text-foreground">Location detected:</p>
               <p className="text-sm text-muted-foreground mt-1">
-                {locationData.city}, {locationData.state}
-                {locationData.zipCode && ` ${locationData.zipCode}`}
+                {locationData.city}, {locationData.province}
+                {locationData.postalCode && ` ${locationData.postalCode}`}
               </p>
             </div>
             <Button

@@ -2,12 +2,13 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 /**
- * Create a new subscription record
+ * Create a new subscription record (contribution)
  */
 export const createSubscription = mutation({
   args: {
     userId: v.id("users"),
-    amount: v.number(),
+    poolId: v.id("communityPools"),
+    weeklyAmount: v.number(),
     stripeSubscriptionId: v.string(),
     stripeCustomerId: v.string(),
     startDate: v.number(),
@@ -28,15 +29,26 @@ export const createSubscription = mutation({
     const now = Date.now();
     const subscriptionId = await ctx.db.insert("subscriptions", {
       userId: args.userId,
-      amount: args.amount,
+      poolId: args.poolId,
+      weeklyAmount: args.weeklyAmount,
       status: "active",
       stripeSubscriptionId: args.stripeSubscriptionId,
       stripeCustomerId: args.stripeCustomerId,
+      totalContributed: 0,
       startDate: args.startDate,
-      lastDistributionDate: null,
       createdAt: now,
       updatedAt: now,
     });
+
+    // Update pool contributor count
+    const pool = await ctx.db.get(args.poolId);
+    if (pool) {
+      await ctx.db.patch(args.poolId, {
+        totalContributors: pool.totalContributors + 1,
+        weeklyContributions: pool.weeklyContributions + args.weeklyAmount,
+        updatedAt: now,
+      });
+    }
 
     return subscriptionId;
   },
@@ -48,9 +60,10 @@ export const createSubscription = mutation({
 export const updateSubscription = mutation({
   args: {
     subscriptionId: v.id("subscriptions"),
-    amount: v.optional(v.number()),
-    status: v.optional(v.union(v.literal("active"), v.literal("paused"), v.literal("cancelled"))),
-    lastDistributionDate: v.optional(v.union(v.number(), v.null())),
+    weeklyAmount: v.optional(v.number()),
+    status: v.optional(
+      v.union(v.literal("active"), v.literal("paused"), v.literal("cancelled"))
+    ),
   },
   handler: async (ctx, args) => {
     const subscription = await ctx.db.get(args.subscriptionId);
@@ -59,20 +72,85 @@ export const updateSubscription = mutation({
     }
 
     const updates: {
-      amount?: number;
+      weeklyAmount?: number;
       status?: "active" | "paused" | "cancelled";
-      lastDistributionDate?: number | null;
       updatedAt: number;
     } = {
       updatedAt: Date.now(),
     };
 
-    if (args.amount !== undefined) updates.amount = args.amount;
+    // Track old values for pool update
+    const oldAmount = subscription.weeklyAmount;
+    const wasActive = subscription.status === "active";
+
+    if (args.weeklyAmount !== undefined) updates.weeklyAmount = args.weeklyAmount;
     if (args.status !== undefined) updates.status = args.status;
-    if (args.lastDistributionDate !== undefined)
-      updates.lastDistributionDate = args.lastDistributionDate;
 
     await ctx.db.patch(args.subscriptionId, updates);
+
+    // Update pool if amount or status changed
+    const pool = await ctx.db.get(subscription.poolId);
+    if (pool) {
+      const newAmount = args.weeklyAmount ?? oldAmount;
+      const isActive = (args.status ?? subscription.status) === "active";
+
+      let poolUpdates: {
+        weeklyContributions?: number;
+        totalContributors?: number;
+        updatedAt: number;
+      } = { updatedAt: Date.now() };
+
+      // Handle amount change for active subscriptions
+      if (wasActive && isActive && args.weeklyAmount !== undefined) {
+        poolUpdates.weeklyContributions =
+          pool.weeklyContributions - oldAmount + newAmount;
+      }
+
+      // Handle status change
+      if (wasActive && !isActive) {
+        poolUpdates.totalContributors = pool.totalContributors - 1;
+        poolUpdates.weeklyContributions = pool.weeklyContributions - oldAmount;
+      } else if (!wasActive && isActive) {
+        poolUpdates.totalContributors = pool.totalContributors + 1;
+        poolUpdates.weeklyContributions = pool.weeklyContributions + newAmount;
+      }
+
+      await ctx.db.patch(subscription.poolId, poolUpdates);
+    }
+
+    return await ctx.db.get(args.subscriptionId);
+  },
+});
+
+/**
+ * Record a contribution (called after successful Stripe payment)
+ */
+export const recordContribution = mutation({
+  args: {
+    subscriptionId: v.id("subscriptions"),
+    amount: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const subscription = await ctx.db.get(args.subscriptionId);
+    if (!subscription) {
+      throw new Error("Subscription not found");
+    }
+
+    // Update subscription total
+    await ctx.db.patch(args.subscriptionId, {
+      totalContributed: subscription.totalContributed + args.amount,
+      updatedAt: Date.now(),
+    });
+
+    // Update pool funds
+    const pool = await ctx.db.get(subscription.poolId);
+    if (pool) {
+      await ctx.db.patch(subscription.poolId, {
+        totalFundsAvailable: pool.totalFundsAvailable + args.amount,
+        updatedAt: Date.now(),
+      });
+    }
+
     return await ctx.db.get(args.subscriptionId);
   },
 });
@@ -110,32 +188,34 @@ export const getUserSubscriptions = query({
 });
 
 /**
- * Get all active subscriptions in a city
+ * Get active subscription for a user
  */
-export const getActiveSubscriptionsByCity = query({
+export const getActiveSubscription = query({
   args: {
-    city: v.string(),
+    userId: v.id("users"),
   },
   handler: async (ctx, args) => {
-    // First get all users in the city
-    const users = await ctx.db
-      .query("users")
-      .withIndex("by_city", (q) => q.eq("city", args.city))
-      .collect();
-
-    if (users.length === 0) {
-      return [];
-    }
-
-    // Get all active subscriptions for these users
     const subscriptions = await ctx.db
       .query("subscriptions")
-      .withIndex("by_status", (q) => q.eq("status", "active"))
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
       .collect();
 
-    // Filter subscriptions to only those belonging to users in the city
-    const userIds = new Set(users.map((u) => u._id));
-    return subscriptions.filter((sub) => userIds.has(sub.userId));
+    return subscriptions.find((s) => s.status === "active") ?? null;
+  },
+});
+
+/**
+ * Get all subscriptions in a pool
+ */
+export const getPoolSubscriptions = query({
+  args: {
+    poolId: v.id("communityPools"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("subscriptions")
+      .withIndex("by_poolId", (q) => q.eq("poolId", args.poolId))
+      .collect();
   },
 });
 
@@ -152,10 +232,25 @@ export const cancelSubscription = mutation({
       throw new Error("Subscription not found");
     }
 
+    const wasActive = subscription.status === "active";
+
     await ctx.db.patch(args.subscriptionId, {
       status: "cancelled",
       updatedAt: Date.now(),
     });
+
+    // Update pool if subscription was active
+    if (wasActive) {
+      const pool = await ctx.db.get(subscription.poolId);
+      if (pool) {
+        await ctx.db.patch(subscription.poolId, {
+          totalContributors: pool.totalContributors - 1,
+          weeklyContributions:
+            pool.weeklyContributions - subscription.weeklyAmount,
+          updatedAt: Date.now(),
+        });
+      }
+    }
 
     return await ctx.db.get(args.subscriptionId);
   },
