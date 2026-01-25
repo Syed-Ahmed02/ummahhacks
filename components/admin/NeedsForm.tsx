@@ -67,7 +67,7 @@ export function NeedsForm({
             </FieldLabel>
             <Select
               value={charityId}
-              onValueChange={setCharityId}
+              onValueChange={(value) => setCharityId(value ?? "")}
               required
             >
               <SelectTrigger>
