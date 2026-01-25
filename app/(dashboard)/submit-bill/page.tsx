@@ -93,7 +93,7 @@ export default function SubmitBillPage() {
   // Only recipients can submit bills
   if (convexUser.role !== "recipient") {
     return (
-      <div className="container max-w-2xl py-8">
+      <div className="container mx-auto max-w-2xl py-8">
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="size-12 text-muted-foreground mx-auto mb-4" />
@@ -112,7 +112,7 @@ export default function SubmitBillPage() {
   // Check eligibility
   if (eligibility && !eligibility.eligible) {
     return (
-      <div className="container max-w-2xl py-8">
+      <div className="container mx-auto max-w-2xl py-8">
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="size-12 text-muted-foreground mx-auto mb-4" />
@@ -435,7 +435,7 @@ export default function SubmitBillPage() {
   const currentStepIndex = steps.indexOf(step);
 
   return (
-    <div className="container max-w-2xl py-8">
+    <div className="container mx-auto max-w-2xl py-8">
       <div className="mb-8">
         <Button
           variant="ghost"
