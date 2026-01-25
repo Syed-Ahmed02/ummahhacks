@@ -24,6 +24,12 @@
 .DS_Store
 *.pem
 
+# Windows reserved device names (e.g. accidental redirect > nul)
+nul
+CON
+PRN
+AUX
+
 # debug
 npm-debug.log*
 yarn-debug.log*
