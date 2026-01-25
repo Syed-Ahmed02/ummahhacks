@@ -27,7 +27,7 @@ function generateUniqueSlug(baseSlug: string): string {
 export const createCampaign = mutation({
   args: {
     userId: v.id("users"),
-    billSubmissionId: v.optional(v.id("billSubmissions")),
+    billSubmissionId: v.id("billSubmissions"), // Required: must link to an existing bill
     title: v.string(),
     description: v.string(),
     goalAmount: v.number(),
@@ -44,6 +44,7 @@ export const createCampaign = mutation({
     showRecipientName: v.boolean(),
     showRecipientLocation: v.boolean(),
     showBillDetails: v.boolean(),
+    heroImageStorageId: v.optional(v.string()), // Optional: campaign hero image
   },
   handler: async (ctx, args) => {
     // Verify user exists
@@ -57,15 +58,28 @@ export const createCampaign = mutation({
       throw new Error("Only recipients can create campaigns");
     }
 
-    // If billSubmissionId is provided, verify it exists and belongs to user
-    if (args.billSubmissionId) {
-      const bill = await ctx.db.get(args.billSubmissionId);
-      if (!bill) {
-        throw new Error("Bill submission not found");
-      }
-      if (bill.userId !== args.userId) {
-        throw new Error("Bill submission does not belong to user");
-      }
+    // Verify billSubmissionId exists and belongs to user
+    const bill = await ctx.db.get(args.billSubmissionId);
+    if (!bill) {
+      throw new Error("Bill submission not found");
+    }
+    if (bill.userId !== args.userId) {
+      throw new Error("Bill submission does not belong to user");
+    }
+
+    // Check if bill already has an active campaign
+    const existingCampaign = await ctx.db
+      .query("campaigns")
+      .withIndex("by_billSubmissionId", (q) =>
+        q.eq("billSubmissionId", args.billSubmissionId)
+      )
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .first();
+
+    if (existingCampaign) {
+      throw new Error(
+        "This bill already has an active campaign. Please complete or deactivate the existing campaign first."
+      );
     }
 
     // Generate unique slug
@@ -106,7 +120,7 @@ export const createCampaign = mutation({
 
     const campaignId = await ctx.db.insert("campaigns", {
       userId: args.userId,
-      billSubmissionId: args.billSubmissionId ?? null,
+      billSubmissionId: args.billSubmissionId,
       title: args.title,
       description: args.description,
       goalAmount: args.goalAmount,
@@ -123,6 +137,8 @@ export const createCampaign = mutation({
       showRecipientName,
       showRecipientLocation,
       showBillDetails,
+      heroImageStorageId: args.heroImageStorageId,
+      billValidatedAt: now,
       donationCount: 0,
       lastDonationAt: null,
       createdAt: now,
@@ -181,8 +197,20 @@ export const getCampaignBySlug = query({
     // Get user info for display
     const user = await ctx.db.get(campaign.userId);
 
+    // Get hero image URL from storage if available
+    let heroImageUrl: string | null = null;
+    if (campaign.heroImageStorageId) {
+      try {
+        heroImageUrl = await ctx.storage.getUrl(campaign.heroImageStorageId as any);
+      } catch (e) {
+        // Storage ID might be invalid, use null
+        heroImageUrl = null;
+      }
+    }
+
     return {
       ...campaign,
+      heroImageUrl,
       user: user
         ? {
             city: user.city,
@@ -210,8 +238,19 @@ export const getCampaignById = query({
       ? await ctx.db.get(campaign.billSubmissionId)
       : null;
 
+    // Get hero image URL from storage if available
+    let heroImageUrl: string | null = null;
+    if (campaign.heroImageStorageId) {
+      try {
+        heroImageUrl = await ctx.storage.getUrl(campaign.heroImageStorageId as any);
+      } catch (e) {
+        heroImageUrl = null;
+      }
+    }
+
     return {
       ...campaign,
+      heroImageUrl,
       user,
       bill,
     };
@@ -356,6 +395,7 @@ export const createDonation = mutation({
 
     const donationId = await ctx.db.insert("campaignDonations", {
       campaignId: args.campaignId,
+      linkedBillId: campaign.billSubmissionId, // Link to the bill associated with the campaign
       donorUserId: args.donorUserId ?? null,
       donorEmail: args.donorEmail,
       donorName: args.donorName ?? null,
@@ -365,6 +405,7 @@ export const createDonation = mutation({
       stripePaymentIntentId: args.stripePaymentIntentId,
       stripeCustomerId: args.stripeCustomerId ?? null,
       paymentStatus: "pending",
+      donationSource: "direct", // Direct donation to campaign
       message: args.message ?? null,
       createdAt: now,
       paidAt: null,
@@ -512,3 +553,182 @@ export const getDonationByPaymentIntent = query({
       .first();
   },
 });
+
+/**
+ * Validate bill for campaign creation
+ * Checks if bill exists, belongs to user, and doesn't already have an active campaign
+ */
+export const validateBillForCampaign = query({
+  args: {
+    billId: v.id("billSubmissions"),
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    // Check if bill exists
+    const bill = await ctx.db.get(args.billId);
+    if (!bill) {
+      return {
+        valid: false,
+        error: "Bill submission not found",
+      };
+    }
+
+    // Check if bill belongs to user
+    if (bill.userId !== args.userId) {
+      return {
+        valid: false,
+        error: "Bill submission does not belong to this user",
+      };
+    }
+
+    // Check if bill already has an active campaign
+    const existingCampaign = await ctx.db
+      .query("campaigns")
+      .withIndex("by_billSubmissionId", (q) =>
+        q.eq("billSubmissionId", args.billId)
+      )
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .first();
+
+    if (existingCampaign) {
+      return {
+        valid: false,
+        error:
+          "This bill already has an active campaign. Please complete or deactivate the existing campaign first.",
+      };
+    }
+
+    return {
+      valid: true,
+      bill: {
+        _id: bill._id,
+        utilityType: bill.utilityType,
+        utilityProvider: bill.utilityProvider,
+        amountDue: bill.amountDue,
+        shutoffDate: bill.shutoffDate,
+        originalDueDate: bill.originalDueDate,
+      },
+    };
+  },
+});
+
+/**
+ * Get user's bills available for campaign creation
+ */
+export const getUserBillsForCampaignCreation = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    // Get all bills for user
+    const bills = await ctx.db
+      .query("billSubmissions")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    // Get all active campaigns for user
+    const activeCampaigns = await ctx.db
+      .query("campaigns")
+      .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .collect();
+
+    const activeBillIds = new Set(
+      activeCampaigns.map((c) => c.billSubmissionId.toString())
+    );
+
+    // Filter to bills that don't have active campaigns
+    const availableBills = bills
+      .filter(
+        (bill) =>
+          !activeBillIds.has(bill._id.toString()) &&
+          bill.paymentStatus !== "paid" // Don't include already paid bills
+      )
+      .sort((a, b) => b.shutoffDate - a.shutoffDate); // Sort by urgency (nearest first)
+
+    return availableBills.map((bill) => ({
+      _id: bill._id,
+      utilityType: bill.utilityType,
+      utilityProvider: bill.utilityProvider,
+      amountDue: bill.amountDue,
+      shutoffDate: bill.shutoffDate,
+      originalDueDate: bill.originalDueDate,
+      verificationStatus: bill.verificationStatus,
+      paymentStatus: bill.paymentStatus,
+    }));
+  },
+});
+
+/**
+ * Check if campaign image upload is enabled and get upload URL
+ */
+export const listActiveCampaigns = query({
+  args: {},
+  handler: async (ctx) => {
+    // Get all active campaigns
+    const campaigns = await ctx.db
+      .query("campaigns")
+      .withIndex("by_isActive", (q) => q.eq("isActive", true))
+      .collect();
+
+    // Get user info for each campaign
+    const campaignsWithUser = await Promise.all(
+      campaigns.map(async (campaign) => {
+        const user = await ctx.db.get(campaign.userId);
+        return {
+          ...campaign,
+          city: user?.city,
+          province: user?.province,
+        };
+      })
+    );
+
+    return campaignsWithUser;
+  },
+});
+
+/**
+ * Check if campaign image upload is enabled and get upload URL
+ */
+export const getCampaignImageUploadUrl = mutation({
+  args: { campaignId: v.id("campaigns") },
+  handler: async (ctx, args) => {
+    // Verify campaign exists
+    const campaign = await ctx.db.get(args.campaignId);
+    if (!campaign) {
+      throw new Error("Campaign not found");
+    }
+
+    // TODO: Get upload URL from Convex storage
+    // This will be implemented when Convex storage API is available
+    return {
+      uploadUrl: "", // Will be populated with actual URL
+      maxFileSize: 5 * 1024 * 1024, // 5MB
+    };
+  },
+});
+
+/**
+ * Update campaign with hero image after upload
+ */
+export const updateCampaignHeroImage = mutation({
+  args: {
+    campaignId: v.id("campaigns"),
+    heroImageStorageId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // Verify campaign exists
+    const campaign = await ctx.db.get(args.campaignId);
+    if (!campaign) {
+      throw new Error("Campaign not found");
+    }
+
+    const now = Date.now();
+
+    await ctx.db.patch(args.campaignId, {
+      heroImageStorageId: args.heroImageStorageId,
+      updatedAt: now,
+    });
+
+    return await ctx.db.get(args.campaignId);
+  },
+});
+
