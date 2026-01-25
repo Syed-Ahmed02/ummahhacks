@@ -9,19 +9,33 @@ import { CreditCard } from "lucide-react";
 type SubscriptionStatusProps = {
   status?: "active" | "paused" | "cancelled";
   weeklyAmount?: number;
-  nextBillingDate?: string;
+  nextBillingDate?: string | null;
 };
 
 export function SubscriptionStatus({
   status = "active",
   weeklyAmount = 20,
-  nextBillingDate,
+  nextBillingDate = null,
 }: SubscriptionStatusProps) {
   const statusVariant = {
     active: "default",
     paused: "secondary",
     cancelled: "destructive",
   } as const;
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return null;
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch {
+      return dateString;
+    }
+  };
 
   return (
     <Card className="border-border">
@@ -34,11 +48,21 @@ export function SubscriptionStatus({
       </CardHeader>
       <CardContent className="space-y-1">
         <p className="text-muted-foreground text-sm">
-          <span className="text-foreground font-medium">${weeklyAmount}</span> per week
+          <span className="text-foreground font-medium">${weeklyAmount?.toFixed(2) || "0.00"}</span> per week
         </p>
         {status === "active" && nextBillingDate && (
           <p className="text-muted-foreground text-xs">
-            Next billing: {nextBillingDate}
+            Next billing: {formatDate(nextBillingDate) || nextBillingDate}
+          </p>
+        )}
+        {status === "cancelled" && (
+          <p className="text-muted-foreground text-xs">
+            Your subscription has been cancelled
+          </p>
+        )}
+        {status === "paused" && (
+          <p className="text-muted-foreground text-xs">
+            Your subscription is paused
           </p>
         )}
       </CardContent>

@@ -52,7 +52,10 @@ export async function geocodeAddress(address: {
   let result: GeocodeResult | null = staticMap[lookup] ?? null;
   if (!result && address.city && address.state) {
     const cityState = `${address.city}, ${address.state}`.toLowerCase();
-    result = Object.entries(staticMap).find(([k]) => k.startsWith(cityState))?.[1] ?? null;
+    const found = Object.entries(staticMap).find(([k]) => k.startsWith(cityState));
+    if (found) {
+      result = found[1];
+    }
   }
   if (result) {
     cache.set(key, result);
