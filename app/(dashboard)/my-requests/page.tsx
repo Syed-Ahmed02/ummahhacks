@@ -73,7 +73,7 @@ export default function MyRequestsPage() {
   );
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container mx-auto max-w-4xl py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold">My Requests</h1>
