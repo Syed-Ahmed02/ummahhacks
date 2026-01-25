@@ -105,11 +105,26 @@ export default function CreateCampaignPage() {
     // Pre-fill form with bill data
     const bill = userBills?.find((b) => b._id === billId);
     if (bill) {
+      console.log("Bill selected:", bill); // Debug log
       setUtilityType(bill.utilityType);
       setUtilityProvider(bill.utilityProvider);
       setAmountDue(bill.amountDue.toString());
-      setShutoffDate(new Date(bill.shutoffDate).toISOString().split("T")[0]);
+      // Handle both timestamp (number) and Date formats
+      const shutoffTime = typeof bill.shutoffDate === "number" 
+        ? bill.shutoffDate 
+        : new Date(bill.shutoffDate).getTime();
+      const shutoffDateStr = new Date(shutoffTime).toISOString().split("T")[0];
+      setShutoffDate(shutoffDateStr);
       setGoalAmount(bill.amountDue.toString());
+      console.log("Form prefilled with:", {
+        utilityType: bill.utilityType,
+        utilityProvider: bill.utilityProvider,
+        amountDue: bill.amountDue.toString(),
+        shutoffDate: shutoffDateStr,
+        goalAmount: bill.amountDue.toString(),
+      }); // Debug log
+    } else {
+      console.warn("Bill not found in userBills array");
     }
     setStep("details");
   };
@@ -308,22 +323,59 @@ export default function CreateCampaignPage() {
       )}
 
       {step === "details" && (
-        <CampaignForm
-          title={title}
-          description={description}
-          goalAmount={goalAmount}
-          utilityType={utilityType}
-          utilityProvider={utilityProvider}
-          amountDue={amountDue}
-          shutoffDate={shutoffDate}
-          onTitleChange={setTitle}
-          onDescriptionChange={setDescription}
-          onGoalAmountChange={setGoalAmount}
-          onUtilityTypeChange={setUtilityType}
-          onUtilityProviderChange={setUtilityProvider}
-          onAmountDueChange={setAmountDue}
-          onShutoffDateChange={setShutoffDate}
-        />
+        <div className="space-y-4">
+          {billSubmissionId && userBills && (
+            <Card className="border-green-200 bg-green-50">
+              <CardContent className="p-4 flex items-center gap-3">
+                <CheckCircle className="size-5 text-green-600 shrink-0" />
+                <div>
+                  <p className="font-medium text-green-900">
+                    ✓ Bill linked and form prefilled
+                  </p>
+                  <p className="text-sm text-green-800">
+                    {userBills.find((b) => b._id === billSubmissionId) && (
+                      <>
+                        {userBills.find((b) => b._id === billSubmissionId)!.utilityType.charAt(0).toUpperCase() + 
+                         userBills.find((b) => b._id === billSubmissionId)!.utilityType.slice(1)} - {userBills.find((b) => b._id === billSubmissionId)!.utilityProvider} (${userBills.find((b) => b._id === billSubmissionId)!.amountDue.toFixed(2)})
+                      </>
+                    )}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setBillSubmissionId(null);
+                    setUtilityType(null);
+                    setUtilityProvider("");
+                    setAmountDue("");
+                    setShutoffDate("");
+                    setGoalAmount("");
+                  }}
+                  className="ml-auto"
+                >
+                  Change Bill
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+          <CampaignForm
+            title={title}
+            description={description}
+            goalAmount={goalAmount}
+            utilityType={utilityType}
+            utilityProvider={utilityProvider}
+            amountDue={amountDue}
+            shutoffDate={shutoffDate}
+            onTitleChange={setTitle}
+            onDescriptionChange={setDescription}
+            onGoalAmountChange={setGoalAmount}
+            onUtilityTypeChange={setUtilityType}
+            onUtilityProviderChange={setUtilityProvider}
+            onAmountDueChange={setAmountDue}
+            onShutoffDateChange={setShutoffDate}
+          />
+        </div>
       )}
 
       {step === "type" && (

@@ -40,11 +40,21 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
 
   const [isProcessingDonation, setIsProcessingDonation] = React.useState(false);
   const donateSectionRef = React.useRef<HTMLDivElement | null>(null);
-  const [heroImage, setHeroImage] = React.useState(
-    "/Screenshot%202026-01-25%20at%2012.19.44%E2%80%AFPM.png"
-  );
+  const [heroImage, setHeroImage] = React.useState<string | null>(null);
   const [shareCopied, setShareCopied] = React.useState(false);
   const [shareOpen, setShareOpen] = React.useState(false);
+
+  // Set hero image from campaign or use fallback
+  React.useEffect(() => {
+    if (campaign?.heroImageUrl) {
+      setHeroImage(campaign.heroImageUrl);
+    } else {
+      // Use default fallback
+      setHeroImage(
+        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80"
+      );
+    }
+  }, [campaign?.heroImageUrl]);
 
   if (campaign === undefined || donations === undefined) {
     return (
@@ -204,7 +214,7 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
               <div className="aspect-[4/3] bg-slate-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={heroImage}
+                  src={heroImage || ""}
                   alt="Community relief"
                   className="h-full w-full object-cover"
                   onError={() =>
