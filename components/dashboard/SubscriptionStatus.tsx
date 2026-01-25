@@ -9,12 +9,14 @@ import { CreditCard } from "lucide-react";
 type SubscriptionStatusProps = {
   status?: "active" | "paused" | "cancelled";
   weeklyAmount?: number;
+  interval?: "week" | "month" | "year";
   nextBillingDate?: string | null;
 };
 
 export function SubscriptionStatus({
   status = "active",
   weeklyAmount = 20,
+  interval = "week",
   nextBillingDate = null,
 }: SubscriptionStatusProps) {
   const statusVariant = {
@@ -48,7 +50,8 @@ export function SubscriptionStatus({
       </CardHeader>
       <CardContent className="space-y-1">
         <p className="text-muted-foreground text-sm">
-          <span className="text-foreground font-medium">${weeklyAmount?.toFixed(2) || "0.00"}</span> per week
+          <span className="text-foreground font-medium">${weeklyAmount?.toFixed(2) || "0.00"}</span>{" "}
+          {interval === "week" ? "per week" : interval === "month" ? "per month" : "per year"}
         </p>
         {status === "active" && nextBillingDate && (
           <p className="text-muted-foreground text-xs">

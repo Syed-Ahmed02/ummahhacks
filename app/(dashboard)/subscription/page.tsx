@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { SubscriptionStatus } from "@/components/dashboard/SubscriptionStatus";
 import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,41 +15,87 @@ import { Loader2, AlertCircle } from "lucide-react";
 type SubscriptionData = {
   status: "active" | "paused" | "cancelled";
   weeklyAmount: number;
+  interval: "week" | "month" | "year";
   nextBillingDate: string | null;
   subscriptionId: string | null;
 };
 
 export default function SubscriptionPage() {
-  const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
+  const [nextBillingDate, setNextBillingDate] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isCanceling, setIsCanceling] = useState(false);
   const [newAmount, setNewAmount] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  // TODO: Fetch subscription data from Convex
-  useEffect(() => {
-    // Placeholder: Replace with actual Convex query
-    // const fetchSubscription = async () => {
-    //   const data = await getSubscriptionFromConvex();
-    //   setSubscription(data);
-    //   setIsLoading(false);
-    // };
-    // fetchSubscription();
+  // Fetch user from Convex
+  const convexUser = useQuery(
+    api.users.getUserByClerkId,
+    clerkUser?.id ? { clerkId: clerkUser.id } : "skip"
+  );
 
-    // For now, show loading state
-    setTimeout(() => {
-      setIsLoading(false);
-      // Mock data - replace with real data
-      setSubscription({
-        status: "active",
-        weeklyAmount: 20,
-        nextBillingDate: "Jan 27, 2025",
-        subscriptionId: null,
-      });
-    }, 500);
-  }, []);
+  // Fetch active subscription
+  const convexSubscription = useQuery(
+    api.subscriptions.getActiveSubscription,
+    convexUser?._id ? { userId: convexUser._id } : "skip"
+  );
+
+  // Fetch next billing date from Stripe
+  useEffect(() => {
+    const fetchNextBillingDate = async () => {
+      if (!convexSubscription?.stripeSubscriptionId) {
+        setNextBillingDate(null);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/stripe/get-subscription-details?subscriptionId=${convexSubscription.stripeSubscriptionId}`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          if (data.nextBillingDate) {
+            setNextBillingDate(data.nextBillingDate);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch next billing date:", err);
+        // Calculate based on interval and start date as fallback
+        if (convexSubscription?.startDate && convexSubscription?.interval) {
+          const startDate = new Date(convexSubscription.startDate);
+          const nextDate = new Date(startDate);
+
+          if (convexSubscription.interval === "week") {
+            nextDate.setDate(nextDate.getDate() + 7);
+          } else if (convexSubscription.interval === "month") {
+            nextDate.setMonth(nextDate.getMonth() + 1);
+          } else if (convexSubscription.interval === "year") {
+            nextDate.setFullYear(nextDate.getFullYear() + 1);
+          }
+
+          setNextBillingDate(nextDate.toISOString());
+        }
+      }
+    };
+
+    if (convexSubscription) {
+      fetchNextBillingDate();
+    }
+  }, [convexSubscription]);
+
+  // Transform Convex subscription to SubscriptionData
+  const subscription: SubscriptionData | null = convexSubscription
+    ? {
+      status: convexSubscription.status,
+      weeklyAmount: convexSubscription.weeklyAmount,
+      interval: convexSubscription.interval || "week",
+      nextBillingDate,
+      subscriptionId: convexSubscription.stripeSubscriptionId,
+    }
+    : null;
+
+  const isLoading = !isClerkLoaded || convexUser === undefined || convexSubscription === undefined;
 
   const handleOpenPortal = async () => {
     setIsUpdating(true);
@@ -83,7 +132,8 @@ export default function SubscriptionPage() {
 
     const amount = parseFloat(newAmount);
     if (isNaN(amount) || amount < 1) {
-      setError("Invalid amount. Minimum is $1 per week.");
+      const intervalLabel = subscription?.interval === "week" ? "week" : subscription?.interval === "month" ? "month" : "year";
+      setError(`Invalid amount. Minimum is $1 per ${intervalLabel}.`);
       return;
     }
 
@@ -111,13 +161,7 @@ export default function SubscriptionPage() {
 
       setSuccess("Subscription updated successfully!");
       setNewAmount("");
-      // TODO: Refresh subscription data from Convex
-      if (subscription) {
-        setSubscription({
-          ...subscription,
-          weeklyAmount: amount,
-        });
-      }
+      // Subscription data will automatically refresh via Convex query
     } catch (err) {
       const error = err as Error;
       setError(error.message || "Failed to update subscription");
@@ -156,13 +200,7 @@ export default function SubscriptionPage() {
         throw new Error(data.error || "Failed to cancel subscription");
       }
 
-      // TODO: Refresh subscription data from Convex
-      if (subscription) {
-        setSubscription({
-          ...subscription,
-          status: "cancelled",
-        });
-      }
+      // Subscription data will automatically refresh via Convex query
     } catch (err) {
       const error = err as Error;
       setError(error.message || "Failed to cancel subscription");
@@ -210,6 +248,7 @@ export default function SubscriptionPage() {
       <SubscriptionStatus
         status={subscription.status}
         weeklyAmount={subscription.weeklyAmount}
+        interval={subscription.interval}
         nextBillingDate={subscription.nextBillingDate}
       />
 
@@ -261,14 +300,18 @@ export default function SubscriptionPage() {
       {subscription.status === "active" && (
         <Card className="border-border">
           <CardHeader>
-            <h2 className="font-medium text-foreground">Change Weekly Amount</h2>
+            <h2 className="font-medium text-foreground">
+              Change {subscription.interval === "week" ? "Weekly" : subscription.interval === "month" ? "Monthly" : "Yearly"} Amount
+            </h2>
             <CardDescription>
-              Update your weekly donation amount. Changes will be prorated.
+              Update your {subscription.interval === "week" ? "weekly" : subscription.interval === "month" ? "monthly" : "yearly"} donation amount. Changes will be prorated.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="new-amount">New weekly amount</Label>
+              <Label htmlFor="new-amount">
+                New {subscription.interval === "week" ? "weekly" : subscription.interval === "month" ? "monthly" : "yearly"} amount
+              </Label>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">$</span>
                 <Input
@@ -305,7 +348,7 @@ export default function SubscriptionPage() {
       {subscription.status === "active" && (
         <Card className="border-border">
           <CardHeader>
-            <h2 className="font-medium text-foreground text-destructive">Cancel Subscription</h2>
+            <h2 className="font-medium text-destructive">Cancel Subscription</h2>
             <CardDescription>
               Cancel your subscription. You can resubscribe anytime.
             </CardDescription>
