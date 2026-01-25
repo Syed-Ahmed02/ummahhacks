@@ -96,7 +96,7 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
   const campaignUrl =
     typeof window !== "undefined" ? window.location.href : "";
 
-  const donationCount = filteredCampaign.donationCount ?? donations?.length ?? 0;
+  const donationCount = campaign.donationCount ?? donations?.length ?? 0;
 
   const handleScrollToDonate = () => {
     donateSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -164,8 +164,8 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
                 <PublicCampaignHeader campaign={filteredCampaign} />
                 {/* Progress moved near the top for immediate visibility */}
                 <CampaignProgress
-                  currentAmount={filteredCampaign.currentAmount}
-                  goalAmount={filteredCampaign.goalAmount}
+                  currentAmount={campaign.currentAmount ?? 0}
+                  goalAmount={campaign.goalAmount ?? 0}
                   donationCount={donationCount}
                   onRefetch={() => router.refresh()}
                 />
@@ -195,12 +195,12 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
                 <StatCard
                   icon={<DollarSign className="size-4 text-green-600" />}
                   label="Raised"
-                  value={formatCurrency(filteredCampaign.currentAmount)}
+                  value={formatCurrency(campaign.currentAmount ?? 0)}
                 />
                 <StatCard
                   icon={<Target className="size-4 text-sky-600" />}
                   label="Goal"
-                  value={formatCurrency(filteredCampaign.goalAmount)}
+                  value={formatCurrency(campaign.goalAmount ?? 0)}
                 />
                 <StatCard
                   icon={<HeartHandshake className="size-4 text-amber-600" />}

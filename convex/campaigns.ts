@@ -27,7 +27,7 @@ function generateUniqueSlug(baseSlug: string): string {
 export const createCampaign = mutation({
   args: {
     userId: v.id("users"),
-    billSubmissionId: v.id("billSubmissions"), // Required: must link to an existing bill
+    billSubmissionId: v.optional(v.id("billSubmissions")), // Optional: can link to an existing bill
     title: v.string(),
     description: v.string(),
     goalAmount: v.number(),
@@ -58,28 +58,30 @@ export const createCampaign = mutation({
       throw new Error("Only recipients can create campaigns");
     }
 
-    // Verify billSubmissionId exists and belongs to user
-    const bill = await ctx.db.get(args.billSubmissionId);
-    if (!bill) {
-      throw new Error("Bill submission not found");
-    }
-    if (bill.userId !== args.userId) {
-      throw new Error("Bill submission does not belong to user");
-    }
+    // Verify billSubmissionId exists and belongs to user (if provided)
+    if (args.billSubmissionId) {
+      const bill = await ctx.db.get(args.billSubmissionId);
+      if (!bill) {
+        throw new Error("Bill submission not found");
+      }
+      if (bill.userId !== args.userId) {
+        throw new Error("Bill submission does not belong to user");
+      }
 
-    // Check if bill already has an active campaign
-    const existingCampaign = await ctx.db
-      .query("campaigns")
-      .withIndex("by_billSubmissionId", (q) =>
-        q.eq("billSubmissionId", args.billSubmissionId)
-      )
-      .filter((q) => q.eq(q.field("isActive"), true))
-      .first();
+      // Check if bill already has an active campaign
+      const existingCampaign = await ctx.db
+        .query("campaigns")
+        .withIndex("by_billSubmissionId", (q) =>
+          q.eq("billSubmissionId", args.billSubmissionId)
+        )
+        .filter((q) => q.eq(q.field("isActive"), true))
+        .first();
 
-    if (existingCampaign) {
-      throw new Error(
-        "This bill already has an active campaign. Please complete or deactivate the existing campaign first."
-      );
+      if (existingCampaign) {
+        throw new Error(
+          "This bill already has an active campaign. Please complete or deactivate the existing campaign first."
+        );
+      }
     }
 
     // Generate unique slug
@@ -120,7 +122,7 @@ export const createCampaign = mutation({
 
     const campaignId = await ctx.db.insert("campaigns", {
       userId: args.userId,
-      billSubmissionId: args.billSubmissionId,
+      billSubmissionId: args.billSubmissionId ?? undefined,
       title: args.title,
       description: args.description,
       goalAmount: args.goalAmount,
@@ -395,7 +397,7 @@ export const createDonation = mutation({
 
     const donationId = await ctx.db.insert("campaignDonations", {
       campaignId: args.campaignId,
-      linkedBillId: campaign.billSubmissionId, // Link to the bill associated with the campaign
+      linkedBillId: campaign.billSubmissionId ?? undefined, // Link to the bill associated with the campaign (if exists)
       donorUserId: args.donorUserId ?? null,
       donorEmail: args.donorEmail,
       donorName: args.donorName ?? null,
@@ -632,7 +634,9 @@ export const getUserBillsForCampaignCreation = query({
       .collect();
 
     const activeBillIds = new Set(
-      activeCampaigns.map((c) => c.billSubmissionId.toString())
+      activeCampaigns
+        .filter((c) => c.billSubmissionId !== undefined)
+        .map((c) => c.billSubmissionId!.toString())
     );
 
     // Filter to bills that don't have active campaigns

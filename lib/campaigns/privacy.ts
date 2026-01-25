@@ -19,6 +19,9 @@ export type CampaignData = {
   utilityProvider: string;
   amountDue: number;
   shutoffDate: number;
+  goalAmount?: number;
+  currentAmount?: number;
+  donationCount?: number;
   user?: {
     city: string;
     province: string;

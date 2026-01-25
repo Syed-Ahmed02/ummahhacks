@@ -205,7 +205,7 @@ export default defineSchema({
   campaigns: defineTable({
     // Campaign owner (recipient)
     userId: v.id("users"),
-    billSubmissionId: v.id("billSubmissions"), // Required: link to existing bill
+    billSubmissionId: v.optional(v.id("billSubmissions")), // Optional: link to existing bill
     
     // Campaign metadata
     title: v.string(),
@@ -264,7 +264,7 @@ export default defineSchema({
     campaignId: v.id("campaigns"),
     
     // Link donation to the associated bill
-    linkedBillId: v.id("billSubmissions"), // Copied from campaign.billSubmissionId
+    linkedBillId: v.optional(v.id("billSubmissions")), // Copied from campaign.billSubmissionId (optional if campaign has no bill)
     
     // Donor information
     donorUserId: v.union(v.id("users"), v.null()), // Null for guest donations

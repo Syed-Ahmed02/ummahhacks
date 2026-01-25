@@ -19,7 +19,7 @@ import Link from "next/link";
 import { formatCurrency } from "@/lib/constants/canada";
 import { LocationBadge } from "./LocationBadge";
 import { ImagePreview } from "./ImagePreview";
-import type { Id } from "@/convex/_generated/datamodel";
+import type { Id } from "@/convex/_generated/dataModel";
 
 interface CampaignFilters {
   utilityType?: string;
@@ -245,7 +245,7 @@ export function CampaignDiscoveryPage() {
 
               return (
                 <Link
-                  key={campaign.id}
+                  key={campaign._id}
                   href={`/campaigns/${campaign.shareableSlug}`}
                 >
                   <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full flex flex-col">
@@ -279,7 +279,7 @@ export function CampaignDiscoveryPage() {
                         <LocationBadge
                           city={campaign.city}
                           province={campaign.province}
-                          isNearUser={campaign.isNearUser}
+                          isNearUser={false}
                           showLocation={true}
                         />
                       </div>

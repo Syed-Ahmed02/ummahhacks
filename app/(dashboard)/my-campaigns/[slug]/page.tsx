@@ -93,7 +93,8 @@ export default function CampaignDetailPage({ params }: CampaignDetailPageProps) 
   }
 
   // Check if user owns this campaign
-  if (campaign.userId !== convexUser._id && convexUser.role !== "admin") {
+  const isAdmin = clerkUser?.publicMetadata?.role === "admin";
+  if (campaign.userId !== convexUser._id && !isAdmin) {
     return (
       <div className="container max-w-4xl py-8">
         <Card>
@@ -185,7 +186,7 @@ export default function CampaignDetailPage({ params }: CampaignDetailPageProps) 
               </div>
             </div>
 
-            {campaign.bill && (
+            {campaign.billSubmissionId && (
               <div className="pt-4 border-t">
                 <div className="flex items-center gap-2">
                   <FileText className="size-4 text-muted-foreground" />

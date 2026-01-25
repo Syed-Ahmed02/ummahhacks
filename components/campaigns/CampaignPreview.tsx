@@ -128,7 +128,7 @@ export function CampaignPreview({
             </p>
             <p>
               <span className="text-muted-foreground">Amount Due:</span>{" "}
-              {amountDue ? formatCurrency(parseFloat(amountDue)) : "Not set"}
+              {amountDue ? formatCurrency(amountDue) : "Not set"}
             </p>
           </div>
         </div>

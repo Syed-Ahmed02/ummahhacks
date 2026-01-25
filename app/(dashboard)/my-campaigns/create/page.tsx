@@ -200,9 +200,23 @@ export default function CreateCampaignPage() {
         throw new Error("Invalid shutoff date");
       }
 
-      const campaignId = await createCampaign({
+      const campaignData: {
+        userId: Id<"users">;
+        billSubmissionId?: Id<"billSubmissions">;
+        title: string;
+        description: string;
+        goalAmount: number;
+        campaignType: "public" | "anonymous";
+        utilityType: UtilityType;
+        utilityProvider: string;
+        amountDue: number;
+        shutoffDate: number;
+        showRecipientName: boolean;
+        showRecipientLocation: boolean;
+        showBillDetails: boolean;
+        heroImageStorageId?: string;
+      } = {
         userId: convexUser._id,
-        billSubmissionId: billSubmissionId ?? undefined,
         title: title.trim(),
         description: description.trim(),
         goalAmount: goalAmountNum,
@@ -215,7 +229,14 @@ export default function CreateCampaignPage() {
         showRecipientLocation,
         showBillDetails,
         heroImageStorageId: heroImageStorageId ?? undefined,
-      });
+      };
+
+      // Only include billSubmissionId if it's not null
+      if (billSubmissionId) {
+        campaignData.billSubmissionId = billSubmissionId;
+      }
+
+      const campaignId = await createCampaign(campaignData);
 
       setCreatedCampaignId(campaignId);
       setStep("success");
