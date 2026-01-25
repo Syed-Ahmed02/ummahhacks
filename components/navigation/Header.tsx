@@ -15,12 +15,15 @@ type HeaderProps = {
   user?: { name?: string; email?: string } | null;
   /** Show logo link in header (e.g. false when used in dashboard with sidebar) */
   showLogo?: boolean;
+  /** Callback for signing out */
+  onSignOut?: () => void;
   className?: string;
 };
 
 export function Header({
   user,
   showLogo = true,
+  onSignOut,
   className,
 }: HeaderProps) {
   const displayName = user?.name ?? "Account";
@@ -54,10 +57,17 @@ export function Header({
               <Settings className="size-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem render={<Link href="/" />}>
-              <LogOut className="size-4" />
-              Back to home
-            </DropdownMenuItem>
+            {onSignOut ? (
+              <DropdownMenuItem onClick={onSignOut}>
+                <LogOut className="size-4" />
+                Sign out
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem render={<Link href="/" />}>
+                <LogOut className="size-4" />
+                Back to home
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

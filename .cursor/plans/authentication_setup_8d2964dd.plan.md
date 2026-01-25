@@ -4,31 +4,31 @@ overview: Set up Clerk authentication, user onboarding, protected routes, and us
 todos:
   - id: clerk-middleware
     content: Create middleware.ts for route protection and authentication redirects
-    status: pending
+    status: completed
   - id: auth-pages
     content: Create sign-in and sign-up pages using Clerk components
-    status: pending
+    status: completed
   - id: onboarding-flow
     content: Build onboarding page with location form and Convex integration
-    status: pending
+    status: completed
   - id: dashboard-layout
     content: Create dashboard layout with authentication checks and navigation
-    status: pending
+    status: completed
   - id: profile-page
     content: Create user profile page with location editing
-    status: pending
+    status: completed
   - id: admin-protection
     content: Create admin layout and role checking utilities
-    status: pending
+    status: completed
   - id: auth-helpers
     content: Create lib/auth.ts with requireAuth and requireAdmin helpers
-    status: pending
+    status: completed
   - id: user-hook
     content: Create useUser hook combining Clerk and Convex user data
-    status: pending
+    status: completed
   - id: clerk-webhook
     content: Set up Clerk webhook handler for user sync (optional)
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -40,7 +40,7 @@ This plan covers Clerk authentication integration, user onboarding flow, protect
 
 ## Clerk Configuration
 
-### File: `middleware.ts` (root)
+### File: `proxy.ts` (root)
 
 Set up Clerk middleware for route protection:
 

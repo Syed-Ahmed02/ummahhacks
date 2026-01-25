@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 const adminNav = [
   { href: "/admin/charities", label: "Charities" },
@@ -16,6 +19,36 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isLoaded } = useUser();
+
+  // Check if user is admin
+  const isAdmin = user?.publicMetadata?.role === "admin";
+
+  // Redirect non-admins to dashboard
+  useEffect(() => {
+    if (isLoaded && !isAdmin) {
+      router.replace("/dashboard");
+    }
+  }, [isLoaded, isAdmin, router]);
+
+  // Show loading state
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  // Don't render if not admin (redirecting)
+  if (!isAdmin) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
