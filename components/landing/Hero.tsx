@@ -2,17 +2,16 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export function Hero() {
   return (
-    <section
-      className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32"
-      aria-labelledby="hero-heading"
-    >
+      <section
+        className="px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36"
+        aria-labelledby="hero-heading"
+      >
       <div className="mx-auto max-w-4xl text-center">
-        <p className="text-primary mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm font-medium">
-          <Shield className="size-4" aria-hidden />
+        <p className="text-muted-foreground mb-6 text-xs font-medium uppercase tracking-[0.2em]">
           Neighborhood utility insurance
         </p>
         <h1

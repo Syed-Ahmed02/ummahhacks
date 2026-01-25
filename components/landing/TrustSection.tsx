@@ -29,7 +29,7 @@ const reasons = [
 export function TrustSection() {
   return (
     <section
-      className="border-t border-border bg-muted/30 px-4 py-16 sm:px-6 sm:py-24 lg:px-8"
+      className="border-t border-border px-4 py-20 sm:px-6 sm:py-28 lg:px-8"
       aria-labelledby="trust-heading"
     >
       <div className="mx-auto max-w-5xl">
@@ -45,8 +45,8 @@ export function TrustSection() {
         <div className="mt-12 grid gap-8 lg:grid-cols-3">
           {reasons.map(({ title, description, icon: Icon, highlights }) => (
             <div key={title} className="rounded-xl border border-border bg-background p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                <Icon className="text-primary size-6" aria-hidden />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border">
+                <Icon className="text-foreground size-6" aria-hidden />
               </div>
               <h3 className="font-semibold text-foreground mt-4 text-lg">
                 {title}
@@ -60,7 +60,7 @@ export function TrustSection() {
                     key={highlight}
                     className="flex items-center gap-2 text-sm text-muted-foreground"
                   >
-                    <span className="size-1.5 rounded-full bg-primary" aria-hidden />
+                    <span className="size-1.5 rounded-full bg-foreground" aria-hidden />
                     {highlight}
                   </li>
                 ))}

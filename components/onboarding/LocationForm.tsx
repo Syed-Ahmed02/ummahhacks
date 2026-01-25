@@ -142,7 +142,7 @@ export function LocationForm({
         )}
 
         {geolocationState === "success" && locationData && (
-          <div className="space-y-3 rounded-lg border border-border bg-muted/50 p-4">
+          <div className="space-y-3 rounded-lg border border-border p-4">
             <div>
               <p className="text-sm font-medium text-foreground">Location detected:</p>
               <p className="text-sm text-muted-foreground mt-1">
@@ -165,7 +165,7 @@ export function LocationForm({
 
         {(geolocationState === "error" || geolocationState === "denied") && (
           <div className="space-y-3">
-            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+            <div className="rounded-lg border border-destructive/50 p-4">
               <p className="text-sm text-destructive font-medium mb-1">
                 {geolocationState === "denied" ? "Location Access Denied" : "Location Error"}
               </p>

@@ -21,7 +21,7 @@ export function ContributionStats({
   status,
 }: ContributionStatsProps) {
   const statusVariant = {
-    active: "default",
+    active: "outline",
     paused: "secondary",
     cancelled: "destructive",
   } as const;

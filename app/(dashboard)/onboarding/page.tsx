@@ -142,9 +142,9 @@ export default function OnboardingPage() {
                 key={s}
                 className={`h-2 w-8 rounded-full transition-colors ${
                   step === s
-                    ? "bg-primary"
+                    ? "bg-foreground"
                     : ["role", "location", "confirmation"].indexOf(step) > i
-                      ? "bg-primary/50"
+                      ? "bg-muted-foreground"
                       : "bg-muted"
                 }`}
               />
@@ -201,7 +201,7 @@ export default function OnboardingPage() {
           {/* Step 3: Confirmation */}
           {step === "confirmation" && onboardingData.role && onboardingData.location && (
             <div className="space-y-6">
-              <div className="rounded-lg border border-border bg-muted/50 p-4 space-y-4">
+              <div className="rounded-lg border border-border p-4 space-y-4">
                 <div>
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                     Your Role
@@ -223,7 +223,7 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-primary/5 border border-primary/20 p-4">
+              <div className="rounded-lg border border-border p-4">
                 <p className="text-sm text-muted-foreground">
                   {onboardingData.role === "contributor" ? (
                     <>

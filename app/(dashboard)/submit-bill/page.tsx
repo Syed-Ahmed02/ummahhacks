@@ -7,7 +7,7 @@ import { useMutation, useQuery, useAction } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -96,7 +96,7 @@ export default function SubmitBillPage() {
       <div className="container max-w-2xl py-8">
         <Card>
           <CardContent className="p-8 text-center">
-            <AlertCircle className="size-12 text-destructive mx-auto mb-4" />
+            <AlertCircle className="size-12 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Contributors Cannot Submit Bills</h2>
             <p className="text-muted-foreground mb-4">
               Only recipients can submit utility bills for assistance. If you need help with your
@@ -115,7 +115,7 @@ export default function SubmitBillPage() {
       <div className="container max-w-2xl py-8">
         <Card>
           <CardContent className="p-8 text-center">
-            <AlertCircle className="size-12 text-amber-500 mx-auto mb-4" />
+            <AlertCircle className="size-12 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Assistance Limit Reached</h2>
             <p className="text-muted-foreground mb-4">
               You have received the maximum of 3 bill payments in the past 12 months.
@@ -374,7 +374,7 @@ export default function SubmitBillPage() {
             </Card>
 
             {eligibility && (
-              <div className="bg-muted/50 rounded-lg p-4 text-sm">
+              <div className="rounded-lg border border-border p-4 text-sm">
                 <p>
                   After this request, you will have{" "}
                   <span className="font-medium">
@@ -386,7 +386,7 @@ export default function SubmitBillPage() {
             )}
 
             {error && (
-              <div className="bg-destructive/10 text-destructive rounded-lg p-4 text-sm">
+              <div className="border border-destructive/50 text-destructive rounded-lg p-4 text-sm">
                 {error}
               </div>
             )}
@@ -413,7 +413,7 @@ export default function SubmitBillPage() {
       case "success":
         return (
           <div className="text-center py-8">
-            <CheckCircle className="size-16 text-green-500 mx-auto mb-4" />
+            <CheckCircle className="size-16 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-2xl font-semibold mb-2">Request Submitted!</h2>
             <p className="text-muted-foreground mb-6">
               Your bill has been submitted for verification. We'll review it and notify you
@@ -461,7 +461,7 @@ export default function SubmitBillPage() {
           </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-primary transition-all duration-300"
+              className="h-full bg-foreground transition-all duration-300"
               style={{ width: `${((currentStepIndex + 1) / steps.length) * 100}%` }}
             />
           </div>

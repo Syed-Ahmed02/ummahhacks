@@ -157,7 +157,7 @@ export function BillUploader({ onUploadComplete, onError }: BillUploaderProps) {
       />
 
       {uploadState === "success" && file ? (
-        <Card className="border-green-500 bg-green-50 dark:bg-green-950/20">
+        <Card className="border-border">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -179,7 +179,7 @@ export function BillUploader({ onUploadComplete, onError }: BillUploaderProps) {
                   <p className="text-sm text-muted-foreground">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
-                  <div className="flex items-center gap-1 text-green-600 text-sm mt-1">
+                  <div className="flex items-center gap-1 text-muted-foreground text-sm mt-1">
                     <CheckCircle className="size-4" />
                     <span>Uploaded successfully</span>
                   </div>
@@ -200,9 +200,9 @@ export function BillUploader({ onUploadComplete, onError }: BillUploaderProps) {
         <Card
           className={cn(
             "cursor-pointer transition-all",
-            uploadState === "dragging" && "border-primary ring-2 ring-primary/20",
+            uploadState === "dragging" && "border-foreground ring-2 ring-foreground/15",
             uploadState === "error" && "border-destructive",
-            uploadState === "idle" && "hover:border-primary/50"
+            uploadState === "idle" && "hover:border-foreground/40"
           )}
           onClick={handleClick}
           onDrop={handleDrop}
@@ -221,12 +221,12 @@ export function BillUploader({ onUploadComplete, onError }: BillUploaderProps) {
             <div className="flex flex-col items-center justify-center text-center">
               {uploadState === "uploading" ? (
                 <>
-                  <Loader2 className="size-12 text-primary animate-spin mb-4" />
+                  <Loader2 className="size-12 text-muted-foreground animate-spin mb-4" />
                   <p className="font-medium text-foreground">Uploading...</p>
                   <div className="w-full max-w-xs mt-4">
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-primary transition-all duration-300"
+                        className="h-full bg-foreground transition-all duration-300"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -259,7 +259,7 @@ export function BillUploader({ onUploadComplete, onError }: BillUploaderProps) {
                     className={cn(
                       "size-12 mb-4",
                       uploadState === "dragging"
-                        ? "text-primary"
+                        ? "text-foreground"
                         : "text-muted-foreground"
                     )}
                   />
