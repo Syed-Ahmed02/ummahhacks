@@ -34,6 +34,7 @@ export default function OnboardingPage() {
   );
 
   const createUser = useMutation(api.users.createUser);
+  const getOrCreatePool = useMutation(api.pools.getOrCreatePool);
 
   // Redirect to dashboard if user already completed onboarding
   useEffect(() => {
@@ -79,6 +80,12 @@ export default function OnboardingPage() {
         province: onboardingData.location.province,
         postalCode: onboardingData.location.postalCode,
         role: onboardingData.role,
+      });
+
+      await getOrCreatePool({
+        city: onboardingData.location.city,
+        province: onboardingData.location.province,
+        postalCode: onboardingData.location.postalCode,
       });
 
       router.push("/dashboard");
