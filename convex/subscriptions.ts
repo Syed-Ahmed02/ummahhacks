@@ -12,6 +12,7 @@ export const createSubscription = mutation({
     stripeSubscriptionId: v.string(),
     stripeCustomerId: v.string(),
     startDate: v.number(),
+    interval: v.optional(v.union(v.literal("week"), v.literal("month"), v.literal("year"))),
   },
   handler: async (ctx, args) => {
     // Check if subscription already exists
@@ -31,6 +32,7 @@ export const createSubscription = mutation({
       userId: args.userId,
       poolId: args.poolId,
       weeklyAmount: args.weeklyAmount,
+      interval: args.interval || "week",
       status: "active",
       stripeSubscriptionId: args.stripeSubscriptionId,
       stripeCustomerId: args.stripeCustomerId,
@@ -253,5 +255,161 @@ export const cancelSubscription = mutation({
     }
 
     return await ctx.db.get(args.subscriptionId);
+  },
+});
+
+/**
+ * Update subscription by Stripe subscription ID (for webhook use)
+ */
+export const updateSubscriptionByStripeId = mutation({
+  args: {
+    stripeSubscriptionId: v.string(),
+    weeklyAmount: v.optional(v.number()),
+    status: v.optional(
+      v.union(v.literal("active"), v.literal("paused"), v.literal("cancelled"))
+    ),
+  },
+  handler: async (ctx, args) => {
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_stripeSubscriptionId", (q) =>
+        q.eq("stripeSubscriptionId", args.stripeSubscriptionId)
+      )
+      .first();
+
+    if (!subscription) {
+      throw new Error("Subscription not found");
+    }
+
+    const updates: {
+      weeklyAmount?: number;
+      status?: "active" | "paused" | "cancelled";
+      updatedAt: number;
+    } = {
+      updatedAt: Date.now(),
+    };
+
+    // Track old values for pool update
+    const oldAmount = subscription.weeklyAmount;
+    const wasActive = subscription.status === "active";
+
+    if (args.weeklyAmount !== undefined) updates.weeklyAmount = args.weeklyAmount;
+    if (args.status !== undefined) updates.status = args.status;
+
+    await ctx.db.patch(subscription._id, updates);
+
+    // Update pool if amount or status changed
+    const pool = await ctx.db.get(subscription.poolId);
+    if (pool) {
+      const newAmount = args.weeklyAmount ?? oldAmount;
+      const isActive = (args.status ?? subscription.status) === "active";
+
+      let poolUpdates: {
+        weeklyContributions?: number;
+        totalContributors?: number;
+        updatedAt: number;
+      } = { updatedAt: Date.now() };
+
+      // Handle amount change for active subscriptions
+      if (wasActive && isActive && args.weeklyAmount !== undefined) {
+        poolUpdates.weeklyContributions =
+          pool.weeklyContributions - oldAmount + newAmount;
+      }
+
+      // Handle status change
+      if (wasActive && !isActive) {
+        poolUpdates.totalContributors = pool.totalContributors - 1;
+        poolUpdates.weeklyContributions = pool.weeklyContributions - oldAmount;
+      } else if (!wasActive && isActive) {
+        poolUpdates.totalContributors = pool.totalContributors + 1;
+        poolUpdates.weeklyContributions = pool.weeklyContributions + newAmount;
+      }
+
+      await ctx.db.patch(subscription.poolId, poolUpdates);
+    }
+
+    return await ctx.db.get(subscription._id);
+  },
+});
+
+/**
+ * Cancel subscription by Stripe subscription ID (for webhook use)
+ */
+export const cancelSubscriptionByStripeId = mutation({
+  args: {
+    stripeSubscriptionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_stripeSubscriptionId", (q) =>
+        q.eq("stripeSubscriptionId", args.stripeSubscriptionId)
+      )
+      .first();
+
+    if (!subscription) {
+      throw new Error("Subscription not found");
+    }
+
+    const wasActive = subscription.status === "active";
+
+    await ctx.db.patch(subscription._id, {
+      status: "cancelled",
+      updatedAt: Date.now(),
+    });
+
+    // Update pool if subscription was active
+    if (wasActive) {
+      const pool = await ctx.db.get(subscription.poolId);
+      if (pool) {
+        await ctx.db.patch(subscription.poolId, {
+          totalContributors: pool.totalContributors - 1,
+          weeklyContributions:
+            pool.weeklyContributions - subscription.weeklyAmount,
+          updatedAt: Date.now(),
+        });
+      }
+    }
+
+    return await ctx.db.get(subscription._id);
+  },
+});
+
+/**
+ * Record contribution by Stripe subscription ID (for webhook use)
+ */
+export const recordContributionByStripeId = mutation({
+  args: {
+    stripeSubscriptionId: v.string(),
+    amount: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_stripeSubscriptionId", (q) =>
+        q.eq("stripeSubscriptionId", args.stripeSubscriptionId)
+      )
+      .first();
+
+    if (!subscription) {
+      throw new Error("Subscription not found");
+    }
+
+    // Update subscription total
+    await ctx.db.patch(subscription._id, {
+      totalContributed: subscription.totalContributed + args.amount,
+      updatedAt: Date.now(),
+    });
+
+    // Update pool funds
+    const pool = await ctx.db.get(subscription.poolId);
+    if (pool) {
+      await ctx.db.patch(subscription.poolId, {
+        totalFundsAvailable: pool.totalFundsAvailable + args.amount,
+        updatedAt: Date.now(),
+      });
+    }
+
+    return await ctx.db.get(subscription._id);
   },
 });

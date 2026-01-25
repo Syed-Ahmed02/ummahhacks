@@ -151,3 +151,51 @@ export const getUsersByCity = query({
       .collect();
   },
 });
+
+/**
+ * Update user charity preferences (opt-out of utility types)
+ */
+export const updateCharityPreferences = mutation({
+  args: {
+    userId: v.id("users"),
+    excludedUtilityTypes: v.array(
+      v.union(
+        v.literal("electric"),
+        v.literal("water"),
+        v.literal("gas"),
+        v.literal("heating")
+      )
+    ),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await ctx.db.patch(args.userId, {
+      charityPreferences: {
+        excludedUtilityTypes: args.excludedUtilityTypes,
+      },
+      updatedAt: Date.now(),
+    });
+
+    return await ctx.db.get(args.userId);
+  },
+});
+
+/**
+ * Get user charity preferences
+ */
+export const getCharityPreferences = query({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      return null;
+    }
+    return user.charityPreferences ?? { excludedUtilityTypes: [] };
+  },
+});
