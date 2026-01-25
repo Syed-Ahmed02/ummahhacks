@@ -9,10 +9,14 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LocationForm, type LocationFormData } from "@/components/onboarding/LocationForm";
 import { RoleSelector, type Role } from "@/components/onboarding/RoleSelector";
+import {
+  ContributionSetup,
+  type ContributionData,
+} from "@/components/onboarding/ContributionSetup";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-type OnboardingStep = "role" | "location" | "confirmation";
+type OnboardingStep = "role" | "location" | "confirmation" | "contribution";
 
 type OnboardingData = {
   role?: Role;
@@ -88,11 +92,56 @@ export default function OnboardingPage() {
         postalCode: onboardingData.location.postalCode,
       });
 
-      router.push("/dashboard");
+      // If contributor, go to contribution step; otherwise, go to dashboard
+      if (onboardingData.role === "contributor") {
+        setStep("contribution");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       console.error("Failed to create user:", err);
       setError("Failed to save your information. Please try again.");
     } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleContributionSkip = () => {
+    router.push("/dashboard");
+  };
+
+  const handleContributionContinue = async (data: ContributionData) => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/stripe/create-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: data.amount,
+          paymentType: data.paymentType,
+          interval: data.interval,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to create checkout session");
+      }
+
+      // Redirect to Stripe Checkout
+      if (result.url) {
+        window.location.href = result.url;
+      }
+    } catch (err) {
+      console.error("Failed to create checkout session:", err);
+      setError(
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
+      );
       setIsSubmitting(false);
     }
   };
@@ -102,6 +151,34 @@ export default function OnboardingPage() {
       setStep("role");
     } else if (step === "confirmation") {
       setStep("location");
+    }
+    // Note: Can't go back from contribution step since user is already created
+  };
+
+  // Get steps for indicator based on role
+  const getSteps = () => {
+    if (onboardingData.role === "contributor") {
+      return ["role", "location", "confirmation", "contribution"];
+    }
+    return ["role", "location", "confirmation"];
+  };
+
+  const steps = getSteps();
+  const currentStepIndex = steps.indexOf(step);
+
+  // Get step description
+  const getStepDescription = () => {
+    switch (step) {
+      case "role":
+        return "How would you like to participate?";
+      case "location":
+        return "Where are you located?";
+      case "confirmation":
+        return "Confirm your details";
+      case "contribution":
+        return "Set up your contribution";
+      default:
+        return "";
     }
   };
 
@@ -130,20 +207,16 @@ export default function OnboardingPage() {
           <h1 className="text-2xl font-semibold text-foreground">
             Welcome to Community Invest
           </h1>
-          <p className="mt-2 text-muted-foreground">
-            {step === "role" && "How would you like to participate?"}
-            {step === "location" && "Where are you located?"}
-            {step === "confirmation" && "Confirm your details"}
-          </p>
+          <p className="mt-2 text-muted-foreground">{getStepDescription()}</p>
           {/* Step indicator */}
           <div className="flex items-center justify-center gap-2 mt-4">
-            {["role", "location", "confirmation"].map((s, i) => (
+            {steps.map((s, i) => (
               <div
                 key={s}
                 className={`h-2 w-8 rounded-full transition-colors ${
                   step === s
                     ? "bg-foreground"
-                    : ["role", "location", "confirmation"].indexOf(step) > i
+                    : currentStepIndex > i
                       ? "bg-muted-foreground"
                       : "bg-muted"
                 }`}
@@ -247,7 +320,11 @@ export default function OnboardingPage() {
                   disabled={isSubmitting}
                   className="w-full gap-2"
                 >
-                  {isSubmitting ? "Creating account..." : "Complete Setup"}
+                  {isSubmitting
+                    ? "Creating account..."
+                    : onboardingData.role === "contributor"
+                      ? "Continue"
+                      : "Complete Setup"}
                   {!isSubmitting && <ArrowRight className="size-4" />}
                 </Button>
                 <Button
@@ -261,6 +338,15 @@ export default function OnboardingPage() {
                 </Button>
               </div>
             </div>
+          )}
+
+          {/* Step 4: Contribution Setup (Contributors only) */}
+          {step === "contribution" && (
+            <ContributionSetup
+              onSkip={handleContributionSkip}
+              onContinue={handleContributionContinue}
+              isLoading={isSubmitting}
+            />
           )}
         </CardContent>
       </Card>

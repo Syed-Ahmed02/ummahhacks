@@ -9,6 +9,19 @@ export default defineSchema({
     province: v.string(),
     postalCode: v.string(),
     role: v.union(v.literal("contributor"), v.literal("recipient")),
+    // Charity preferences - which utility types the user wants to support
+    charityPreferences: v.optional(
+      v.object({
+        excludedUtilityTypes: v.array(
+          v.union(
+            v.literal("electric"),
+            v.literal("water"),
+            v.literal("gas"),
+            v.literal("heating")
+          )
+        ),
+      })
+    ),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -112,7 +125,10 @@ export default defineSchema({
   subscriptions: defineTable({
     userId: v.id("users"),
     poolId: v.id("communityPools"),
-    weeklyAmount: v.number(),
+    weeklyAmount: v.number(), // Amount per interval (kept as weeklyAmount for backwards compatibility)
+    interval: v.optional(
+      v.union(v.literal("week"), v.literal("month"), v.literal("year"))
+    ), // Payment interval - defaults to "week" for existing records
     status: v.union(
       v.literal("active"),
       v.literal("paused"),
@@ -128,6 +144,25 @@ export default defineSchema({
     .index("by_stripeSubscriptionId", ["stripeSubscriptionId"])
     .index("by_userId", ["userId"])
     .index("by_poolId", ["poolId"])
+    .index("by_status", ["status"]),
+
+  // One-time donations (not recurring)
+  oneTimeDonations: defineTable({
+    userId: v.id("users"),
+    poolId: v.id("communityPools"),
+    amount: v.number(),
+    stripePaymentIntentId: v.string(),
+    stripeCustomerId: v.string(),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("succeeded"),
+      v.literal("failed")
+    ),
+    createdAt: v.number(),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_poolId", ["poolId"])
+    .index("by_stripePaymentIntentId", ["stripePaymentIntentId"])
     .index("by_status", ["status"]),
 
   payments: defineTable({
