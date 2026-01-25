@@ -12,6 +12,7 @@ import type * as bills from "../bills.js";
 import type * as impact from "../impact.js";
 import type * as payments from "../payments.js";
 import type * as pools from "../pools.js";
+import type * as storage from "../storage.js";
 import type * as subscriptions from "../subscriptions.js";
 import type * as users from "../users.js";
 
@@ -26,6 +27,7 @@ declare const fullApi: ApiFromModules<{
   impact: typeof impact;
   payments: typeof payments;
   pools: typeof pools;
+  storage: typeof storage;
   subscriptions: typeof subscriptions;
   users: typeof users;
 }>;
