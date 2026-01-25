@@ -21,7 +21,7 @@ export function Hero() {
           Keep Your Neighbors&apos; Lights On
         </h1>
         <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg sm:text-xl">
-          Subscribe weekly. When a neighbor can&apos;t pay their utility bill, our AI verifies the need and we pay the provider directly. No cash changes hands.
+          Subscribe weekly. When a neighbor can&apos;t pay their utility bill, our AI verifies the need and we pay the provider directly. No cash is exchanged.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button render={<Link href="/subscribe" />} nativeButton={false} size="lg" className="gap-2 text-base">
