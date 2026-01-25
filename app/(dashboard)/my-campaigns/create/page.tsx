@@ -20,9 +20,10 @@ import { CampaignTypeSelector, type CampaignType } from "@/components/campaigns/
 import { CampaignForm } from "@/components/campaigns/CampaignForm";
 import { PrivacySettings } from "@/components/campaigns/PrivacySettings";
 import { CampaignPreview } from "@/components/campaigns/CampaignPreview";
+import { CampaignImageUploader } from "@/components/campaigns/CampaignImageUploader";
 import type { UtilityType } from "@/components/request/UtilityTypeSelector";
 
-type Step = "bill" | "details" | "type" | "privacy" | "preview" | "success";
+type Step = "bill" | "details" | "type" | "privacy" | "image" | "preview" | "success";
 
 export default function CreateCampaignPage() {
   const router = useRouter();
@@ -53,6 +54,8 @@ export default function CreateCampaignPage() {
   const [showRecipientName, setShowRecipientName] = useState(true);
   const [showRecipientLocation, setShowRecipientLocation] = useState(true);
   const [showBillDetails, setShowBillDetails] = useState(false);
+  const [heroImageStorageId, setHeroImageStorageId] = useState<string | null>(null);
+  const [heroImagePreviewUrl, setHeroImagePreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdCampaignId, setCreatedCampaignId] = useState<Id<"campaigns"> | null>(null);
@@ -151,6 +154,8 @@ export default function CreateCampaignPage() {
       }
       setStep("privacy");
     } else if (step === "privacy") {
+      setStep("image");
+    } else if (step === "image") {
       setStep("preview");
     }
   };
@@ -162,8 +167,10 @@ export default function CreateCampaignPage() {
       setStep("details");
     } else if (step === "privacy") {
       setStep("type");
-    } else if (step === "preview") {
+    } else if (step === "image") {
       setStep("privacy");
+    } else if (step === "preview") {
+      setStep("image");
     }
   };
 
@@ -207,6 +214,7 @@ export default function CreateCampaignPage() {
         showRecipientName,
         showRecipientLocation,
         showBillDetails,
+        heroImageStorageId: heroImageStorageId ?? undefined,
       });
 
       setCreatedCampaignId(campaignId);
@@ -407,6 +415,17 @@ export default function CreateCampaignPage() {
         />
       )}
 
+      {step === "image" && (
+        <CampaignImageUploader
+          imageStorageId={heroImageStorageId}
+          imagePreviewUrl={heroImagePreviewUrl}
+          onImageChange={(storageId, previewUrl) => {
+            setHeroImageStorageId(storageId);
+            setHeroImagePreviewUrl(previewUrl);
+          }}
+        />
+      )}
+
       {step === "preview" && campaignType && utilityType && (
         <CampaignPreview
           title={title}
@@ -420,6 +439,7 @@ export default function CreateCampaignPage() {
           showRecipientName={showRecipientName}
           showRecipientLocation={showRecipientLocation}
           showBillDetails={showBillDetails}
+          imagePreviewUrl={heroImagePreviewUrl}
         />
       )}
 

@@ -44,15 +44,15 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
   const [shareCopied, setShareCopied] = React.useState(false);
   const [shareOpen, setShareOpen] = React.useState(false);
 
+  const DEFAULT_CAMPAIGN_IMAGE = "/default-campaign-image.png";
+
   // Set hero image from campaign or use fallback
   React.useEffect(() => {
     if (campaign?.heroImageUrl) {
       setHeroImage(campaign.heroImageUrl);
     } else {
-      // Use default fallback
-      setHeroImage(
-        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80"
-      );
+      // Use default fallback from public folder
+      setHeroImage(DEFAULT_CAMPAIGN_IMAGE);
     }
   }, [campaign?.heroImageUrl]);
 
@@ -217,11 +217,7 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
                   src={heroImage || ""}
                   alt="Community relief"
                   className="h-full w-full object-cover"
-                  onError={() =>
-                    setHeroImage(
-                      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80"
-                    )
-                  }
+                  onError={() => setHeroImage(DEFAULT_CAMPAIGN_IMAGE)}
                 />
               </div>
               <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-sm font-medium text-slate-700 shadow-sm">

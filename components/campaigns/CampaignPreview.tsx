@@ -3,9 +3,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/constants/canada";
-import { Eye, EyeOff, Calendar, DollarSign } from "lucide-react";
+import { Eye, EyeOff, Calendar, DollarSign, Image as ImageIcon } from "lucide-react";
 import type { CampaignType } from "./CampaignTypeSelector";
 import type { UtilityType } from "@/components/request/UtilityTypeSelector";
+
+const DEFAULT_CAMPAIGN_IMAGE = "/default-campaign-image.png";
 
 type CampaignPreviewProps = {
   title: string;
@@ -19,6 +21,7 @@ type CampaignPreviewProps = {
   showRecipientName: boolean;
   showRecipientLocation: boolean;
   showBillDetails: boolean;
+  imagePreviewUrl?: string | null;
 };
 
 export function CampaignPreview({
@@ -33,7 +36,9 @@ export function CampaignPreview({
   showRecipientName,
   showRecipientLocation,
   showBillDetails,
+  imagePreviewUrl,
 }: CampaignPreviewProps) {
+  const displayImage = imagePreviewUrl || DEFAULT_CAMPAIGN_IMAGE;
   const isAnonymous = campaignType === "anonymous";
   const shutoffDateObj = shutoffDate ? new Date(shutoffDate) : null;
   const daysUntilShutoff = shutoffDateObj
@@ -64,6 +69,22 @@ export function CampaignPreview({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Campaign Image */}
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-muted">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={displayImage}
+            alt="Campaign preview"
+            className="h-full w-full object-cover"
+          />
+          {!imagePreviewUrl && (
+            <div className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-xs text-white">
+              <ImageIcon className="size-3" />
+              Default image
+            </div>
+          )}
+        </div>
+
         <div>
           <h3 className="text-2xl font-bold mb-2">{title}</h3>
           <p className="text-muted-foreground whitespace-pre-wrap">{description}</p>

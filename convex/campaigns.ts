@@ -197,8 +197,20 @@ export const getCampaignBySlug = query({
     // Get user info for display
     const user = await ctx.db.get(campaign.userId);
 
+    // Get hero image URL from storage if available
+    let heroImageUrl: string | null = null;
+    if (campaign.heroImageStorageId) {
+      try {
+        heroImageUrl = await ctx.storage.getUrl(campaign.heroImageStorageId as any);
+      } catch (e) {
+        // Storage ID might be invalid, use null
+        heroImageUrl = null;
+      }
+    }
+
     return {
       ...campaign,
+      heroImageUrl,
       user: user
         ? {
             city: user.city,
@@ -226,8 +238,19 @@ export const getCampaignById = query({
       ? await ctx.db.get(campaign.billSubmissionId)
       : null;
 
+    // Get hero image URL from storage if available
+    let heroImageUrl: string | null = null;
+    if (campaign.heroImageStorageId) {
+      try {
+        heroImageUrl = await ctx.storage.getUrl(campaign.heroImageStorageId as any);
+      } catch (e) {
+        heroImageUrl = null;
+      }
+    }
+
     return {
       ...campaign,
+      heroImageUrl,
       user,
       bill,
     };
@@ -372,6 +395,7 @@ export const createDonation = mutation({
 
     const donationId = await ctx.db.insert("campaignDonations", {
       campaignId: args.campaignId,
+      linkedBillId: campaign.billSubmissionId, // Link to the bill associated with the campaign
       donorUserId: args.donorUserId ?? null,
       donorEmail: args.donorEmail,
       donorName: args.donorName ?? null,
@@ -381,6 +405,7 @@ export const createDonation = mutation({
       stripePaymentIntentId: args.stripePaymentIntentId,
       stripeCustomerId: args.stripeCustomerId ?? null,
       paymentStatus: "pending",
+      donationSource: "direct", // Direct donation to campaign
       message: args.message ?? null,
       createdAt: now,
       paidAt: null,
