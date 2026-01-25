@@ -17,7 +17,7 @@ export function Footer() {
     >
       <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 sm:flex-row">
         <p className="text-muted-foreground text-sm">
-          © {new Date().getFullYear()} Community Investment. All rights reserved.
+          © {new Date().getFullYear()} Community Invest. All rights reserved.
         </p>
         <nav aria-label="Footer navigation">
           <ul className="flex flex-wrap justify-center gap-6">

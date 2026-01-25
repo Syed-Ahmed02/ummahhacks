@@ -30,7 +30,7 @@ export function LandingHeader() {
             Dashboard
           </Link>
           <Button render={<Link href="/subscribe" />} nativeButton={false} size="sm">
-            Start Investing
+            Start Contributing
           </Button>
         </nav>
       </div>

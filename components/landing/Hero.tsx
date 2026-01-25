@@ -29,7 +29,7 @@ export function Hero() {
             Start Contributing
             <ArrowRight className="size-4" aria-hidden />
           </Button>
-          <Button render={<Link href="/request-help" />} nativeButton={false} variant="outline" size="lg" className="text-base">
+          <Button render={<Link href="/submit-bill" />} nativeButton={false} variant="outline" size="lg" className="text-base">
             I Need Help
           </Button>
         </div>

@@ -15,7 +15,7 @@ type SubscriptionStatusProps = {
 export function SubscriptionStatus({
   status = "active",
   weeklyAmount = 20,
-  nextBillingDate = "Jan 27, 2025",
+  nextBillingDate,
 }: SubscriptionStatusProps) {
   const statusVariant = {
     active: "default",

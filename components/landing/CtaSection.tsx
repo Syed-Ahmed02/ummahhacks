@@ -56,7 +56,7 @@ export function CtaSection() {
               Struggling to pay a utility bill? Submit your bill and get help directly from your community.
             </p>
             <Button 
-              render={<Link href="/request-help" />} 
+              render={<Link href="/submit-bill" />} 
               nativeButton={false} 
               variant="outline"
               size="lg" 
