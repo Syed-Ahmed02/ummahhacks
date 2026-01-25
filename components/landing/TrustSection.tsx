@@ -53,7 +53,7 @@ export function TrustSection() {
         </p>
         <div className="mt-12 grid gap-8 sm:grid-cols-2">
           {reasons.map(({ title, description, icon: Icon, highlights }) => (
-            <div key={title} className="rounded-xl border border-border bg-background p-6">
+            <div key={title} className="rounded-xl border border-border bg-background p-6 hover-lift">
               <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border">
                 <Icon className="text-foreground size-6" aria-hidden />
               </div>

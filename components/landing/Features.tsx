@@ -65,7 +65,7 @@ export function Features() {
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map(({ title, description, icon: Icon }) => (
-            <Card key={title} className="border-border/80">
+            <Card key={title} className="border-border/80 hover-lift">
               <CardHeader className="pb-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border">
                   <Icon className="text-muted-foreground size-5" aria-hidden />

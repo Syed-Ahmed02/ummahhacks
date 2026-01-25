@@ -23,7 +23,7 @@ export function CtaSection() {
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2 max-w-3xl mx-auto items-stretch">
           {/* Contributor CTA */}
-          <div className="rounded-xl border border-foreground/30 bg-background p-8 text-center shadow-sm h-full flex flex-col">
+          <div className="rounded-xl border border-foreground/30 bg-background p-8 text-center shadow-sm h-full flex flex-col hover-lift">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-border">
               <HandHeart className="text-foreground size-7" aria-hidden />
             </div>
@@ -47,7 +47,7 @@ export function CtaSection() {
           </div>
           
           {/* Recipient CTA */}
-          <div className="rounded-xl border border-border bg-background p-8 text-center h-full flex flex-col">
+          <div className="rounded-xl border border-border bg-background p-8 text-center h-full flex flex-col hover-lift">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-border">
               <HelpCircle className="text-foreground size-7" aria-hidden />
             </div>
