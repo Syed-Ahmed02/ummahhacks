@@ -311,3 +311,15 @@ export const getRecentPaidBills = query({
     }));
   },
 });
+
+/**
+ * Get all bills (for admin)
+ */
+export const getAllBills = query({
+  args: {},
+  handler: async (ctx) => {
+    const bills = await ctx.db.query("billSubmissions").collect();
+    // Sort by shutoff date (most urgent first)
+    return bills.sort((a, b) => a.shutoffDate - b.shutoffDate);
+  },
+});

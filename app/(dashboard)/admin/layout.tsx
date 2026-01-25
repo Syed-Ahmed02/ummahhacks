@@ -6,11 +6,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { ClipboardCheck, CreditCard, Users } from "lucide-react";
 
 const adminNav = [
-  { href: "/admin/charities", label: "Charities" },
-  { href: "/admin/charities/map", label: "Charity map" },
-  { href: "/admin/needs", label: "Needs data" },
+  { href: "/admin/bills", label: "Bill Review", icon: ClipboardCheck },
+  { href: "/admin/payments", label: "Payments", icon: CreditCard },
+  { href: "/admin/pools", label: "Pools", icon: Users },
 ];
 
 export default function AdminLayout({
@@ -56,19 +57,20 @@ export default function AdminLayout({
         className="flex flex-wrap gap-2 border-b border-border pb-4"
         aria-label="Admin navigation"
       >
-        {adminNav.map(({ href, label }) => {
-          const isActive = pathname === href || (href !== "/admin/charities" && pathname.startsWith(href));
+        {adminNav.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname === href || (href !== "/admin/bills" && pathname.startsWith(href));
           return (
             <Link
               key={href}
               href={href}
               className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
+              <Icon className="size-4" />
               {label}
             </Link>
           );
