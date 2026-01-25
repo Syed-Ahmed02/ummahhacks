@@ -28,6 +28,7 @@ const contributorNavItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/reports", label: "Impact Reports", icon: FileBarChart },
   { href: "/subscription", label: "Subscription", icon: CreditCard },
+  { href: "/subscribe", label: "Subscribe", icon: DollarSign },
   { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
 
