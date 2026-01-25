@@ -57,8 +57,8 @@ export function UtilityTypeSelector({
           <Card
             key={option.type}
             className={cn(
-              "cursor-pointer transition-all hover:border-primary/50",
-              isSelected && "border-primary ring-2 ring-primary/20"
+              "cursor-pointer transition-colors hover:border-foreground/40",
+              isSelected && "border-foreground bg-muted/30"
             )}
             onClick={() => onSelect(option.type)}
             role="button"
@@ -73,10 +73,10 @@ export function UtilityTypeSelector({
             <CardContent className="flex items-center gap-4 p-4">
               <div
                 className={cn(
-                  "flex items-center justify-center size-12 rounded-full",
+                  "flex items-center justify-center size-12 rounded-full border",
                   isSelected
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
+                    ? "border-foreground text-foreground"
+                    : "border-border text-muted-foreground"
                 )}
               >
                 <Icon className="size-6" aria-hidden />

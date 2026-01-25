@@ -27,11 +27,11 @@ function RoleCard({
       type="button"
       onClick={onSelect}
       className={cn(
-        "flex flex-col items-center gap-3 rounded-xl border-2 p-6 text-center transition-all",
-        "hover:border-primary/50 hover:bg-primary/5",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+        "flex flex-col items-center gap-3 rounded-xl border p-6 text-center transition-colors",
+        "hover:border-foreground/40",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 focus-visible:ring-offset-2",
         selected
-          ? "border-primary bg-primary/10"
+          ? "border-foreground bg-muted/30"
           : "border-border bg-background"
       )}
       aria-pressed={selected}
@@ -39,8 +39,8 @@ function RoleCard({
     >
       <div
         className={cn(
-          "flex h-14 w-14 items-center justify-center rounded-full",
-          selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+          "flex h-14 w-14 items-center justify-center rounded-full border",
+          selected ? "border-foreground text-foreground" : "border-border text-muted-foreground"
         )}
       >
         <Icon className="size-7" aria-hidden />

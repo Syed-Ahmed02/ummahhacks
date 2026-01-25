@@ -44,10 +44,10 @@ const features = [
 
 export function Features() {
   return (
-    <section
-      className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8"
-      aria-labelledby="features-heading"
-    >
+      <section
+        className="px-4 py-20 sm:px-6 sm:py-28 lg:px-8"
+        aria-labelledby="features-heading"
+      >
       <div className="mx-auto max-w-5xl">
         <h2
           id="features-heading"
@@ -62,7 +62,7 @@ export function Features() {
           {features.map(({ title, description, icon: Icon }) => (
             <Card key={title} className="border-border/80">
               <CardHeader className="pb-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-muted/50">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border">
                   <Icon className="text-muted-foreground size-5" aria-hidden />
                 </div>
                 <h3 className="font-semibold text-foreground text-base">

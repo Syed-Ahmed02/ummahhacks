@@ -11,20 +11,20 @@ export default function SubscriptionPage() {
       <div>
         <h1 className="font-semibold text-foreground text-2xl">Manage subscription</h1>
         <p className="text-muted-foreground mt-1">
-          Update your payment method or change your weekly amount. Full management is covered by the Stripe plan.
+          Update your payment method or weekly amount. Changes take effect on your next billing cycle.
         </p>
       </div>
-      <SubscriptionStatus status="active" weeklyAmount={20} nextBillingDate="Jan 27, 2025" />
+      <SubscriptionStatus status="active" weeklyAmount={20} />
       <Card className="border-border">
         <CardHeader>
           <h2 className="font-medium text-foreground">Actions</h2>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" disabled>
-            Update payment method (Stripe)
+            Update payment method
           </Button>
           <Button variant="outline" size="sm" disabled>
-            Change weekly amount (Stripe)
+            Change weekly amount
           </Button>
           <Button render={<Link href="/dashboard" />} nativeButton={false} variant="ghost" size="sm">
             Back to dashboard

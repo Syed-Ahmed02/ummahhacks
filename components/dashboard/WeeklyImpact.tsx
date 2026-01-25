@@ -24,9 +24,9 @@ export function WeeklyImpact({
   });
 
   return (
-    <Card className="border-border bg-gradient-to-br from-background to-muted/30">
+    <Card className="border-border">
       <CardHeader className="flex flex-row items-center gap-2 pb-2">
-        <Sparkles className="text-primary size-5" aria-hidden />
+        <Sparkles className="text-muted-foreground size-5" aria-hidden />
         <span className="font-medium">This Week's Impact</span>
         <span className="text-muted-foreground text-xs ml-auto">
           Week of {formattedWeekStart}
@@ -35,8 +35,8 @@ export function WeeklyImpact({
       <CardContent>
         <div className="grid grid-cols-3 gap-4">
           <div className="text-center">
-            <div className="flex items-center justify-center size-10 rounded-full bg-primary/10 mx-auto mb-2">
-              <Users className="size-5 text-primary" aria-hidden />
+            <div className="flex items-center justify-center size-10 rounded-full border border-border mx-auto mb-2">
+              <Users className="size-5 text-muted-foreground" aria-hidden />
             </div>
             <p className="font-semibold text-foreground text-2xl">
               {familiesHelped}
@@ -46,8 +46,8 @@ export function WeeklyImpact({
             </p>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center size-10 rounded-full bg-emerald-500/10 mx-auto mb-2">
-              <DollarSign className="size-5 text-emerald-600 dark:text-emerald-400" aria-hidden />
+            <div className="flex items-center justify-center size-10 rounded-full border border-border mx-auto mb-2">
+              <DollarSign className="size-5 text-muted-foreground" aria-hidden />
             </div>
             <p className="font-semibold text-foreground text-2xl">
               {formatCurrency(totalDistributed)}
@@ -55,8 +55,8 @@ export function WeeklyImpact({
             <p className="text-muted-foreground text-xs">Distributed</p>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center size-10 rounded-full bg-amber-500/10 mx-auto mb-2">
-              <ShieldCheck className="size-5 text-amber-600 dark:text-amber-400" aria-hidden />
+            <div className="flex items-center justify-center size-10 rounded-full border border-border mx-auto mb-2">
+              <ShieldCheck className="size-5 text-muted-foreground" aria-hidden />
             </div>
             <p className="font-semibold text-foreground text-2xl">
               {disconnectionsPrevented ?? familiesHelped}

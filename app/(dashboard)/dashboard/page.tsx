@@ -128,7 +128,7 @@ function RecipientDashboard({
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="border-border">
           <CardContent className="flex flex-col items-center justify-center py-8 text-center">
-            <FileText className="size-10 text-primary mb-3" />
+            <FileText className="size-10 text-muted-foreground mb-3" />
             <p className="font-medium text-foreground mb-2">Submit a Bill</p>
             <p className="text-sm text-muted-foreground mb-4">
               Upload a utility bill that's at risk of shutoff to request assistance.

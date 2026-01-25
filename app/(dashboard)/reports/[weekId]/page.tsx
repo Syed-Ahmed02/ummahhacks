@@ -62,7 +62,7 @@ export default function ReportDetailPage() {
         <div>
           <Link
             href="/reports"
-            className="text-primary mb-2 inline-flex items-center gap-2 text-sm font-medium hover:underline"
+            className="text-muted-foreground mb-2 inline-flex items-center gap-2 text-sm font-medium hover:text-foreground"
           >
             <ArrowLeft className="size-4" /> Back to reports
           </Link>
@@ -78,7 +78,7 @@ export default function ReportDetailPage() {
       <div className="space-y-4">
         <Link
           href="/reports"
-          className="text-primary inline-flex items-center gap-2 text-sm font-medium hover:underline"
+          className="text-muted-foreground inline-flex items-center gap-2 text-sm font-medium hover:text-foreground"
         >
           <ArrowLeft className="size-4" /> Back to reports
         </Link>
@@ -117,7 +117,7 @@ export default function ReportDetailPage() {
       <div>
         <Link
           href="/reports"
-          className="text-primary mb-2 inline-flex items-center gap-2 text-sm font-medium hover:underline"
+          className="text-muted-foreground mb-2 inline-flex items-center gap-2 text-sm font-medium hover:text-foreground"
         >
           <ArrowLeft className="size-4" /> Back to reports
         </Link>
@@ -177,9 +177,9 @@ export default function ReportDetailPage() {
               {Object.entries(utilityBreakdown).map(([type, data]) => {
                 const Icon = utilityIcons[type] ?? Zap;
                 return (
-                  <div key={type} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="rounded-lg bg-background p-2">
-                      <Icon className="size-5" />
+                  <div key={type} className="flex items-center gap-3 p-3 rounded-lg border">
+                    <div className="rounded-lg border border-border p-2">
+                      <Icon className="size-5 text-muted-foreground" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">
