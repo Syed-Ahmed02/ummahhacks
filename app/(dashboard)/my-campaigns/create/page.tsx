@@ -20,9 +20,10 @@ import { CampaignTypeSelector, type CampaignType } from "@/components/campaigns/
 import { CampaignForm } from "@/components/campaigns/CampaignForm";
 import { PrivacySettings } from "@/components/campaigns/PrivacySettings";
 import { CampaignPreview } from "@/components/campaigns/CampaignPreview";
+import { CampaignImageUploader } from "@/components/campaigns/CampaignImageUploader";
 import type { UtilityType } from "@/components/request/UtilityTypeSelector";
 
-type Step = "bill" | "details" | "type" | "privacy" | "preview" | "success";
+type Step = "bill" | "details" | "type" | "privacy" | "image" | "preview" | "success";
 
 export default function CreateCampaignPage() {
   const router = useRouter();
@@ -53,6 +54,8 @@ export default function CreateCampaignPage() {
   const [showRecipientName, setShowRecipientName] = useState(true);
   const [showRecipientLocation, setShowRecipientLocation] = useState(true);
   const [showBillDetails, setShowBillDetails] = useState(false);
+  const [heroImageStorageId, setHeroImageStorageId] = useState<string | null>(null);
+  const [heroImagePreviewUrl, setHeroImagePreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdCampaignId, setCreatedCampaignId] = useState<Id<"campaigns"> | null>(null);
@@ -105,11 +108,26 @@ export default function CreateCampaignPage() {
     // Pre-fill form with bill data
     const bill = userBills?.find((b) => b._id === billId);
     if (bill) {
+      console.log("Bill selected:", bill); // Debug log
       setUtilityType(bill.utilityType);
       setUtilityProvider(bill.utilityProvider);
       setAmountDue(bill.amountDue.toString());
-      setShutoffDate(new Date(bill.shutoffDate).toISOString().split("T")[0]);
+      // Handle both timestamp (number) and Date formats
+      const shutoffTime = typeof bill.shutoffDate === "number" 
+        ? bill.shutoffDate 
+        : new Date(bill.shutoffDate).getTime();
+      const shutoffDateStr = new Date(shutoffTime).toISOString().split("T")[0];
+      setShutoffDate(shutoffDateStr);
       setGoalAmount(bill.amountDue.toString());
+      console.log("Form prefilled with:", {
+        utilityType: bill.utilityType,
+        utilityProvider: bill.utilityProvider,
+        amountDue: bill.amountDue.toString(),
+        shutoffDate: shutoffDateStr,
+        goalAmount: bill.amountDue.toString(),
+      }); // Debug log
+    } else {
+      console.warn("Bill not found in userBills array");
     }
     setStep("details");
   };
@@ -136,6 +154,8 @@ export default function CreateCampaignPage() {
       }
       setStep("privacy");
     } else if (step === "privacy") {
+      setStep("image");
+    } else if (step === "image") {
       setStep("preview");
     }
   };
@@ -147,8 +167,10 @@ export default function CreateCampaignPage() {
       setStep("details");
     } else if (step === "privacy") {
       setStep("type");
-    } else if (step === "preview") {
+    } else if (step === "image") {
       setStep("privacy");
+    } else if (step === "preview") {
+      setStep("image");
     }
   };
 
@@ -192,6 +214,7 @@ export default function CreateCampaignPage() {
         showRecipientName,
         showRecipientLocation,
         showBillDetails,
+        heroImageStorageId: heroImageStorageId ?? undefined,
       });
 
       setCreatedCampaignId(campaignId);
@@ -308,22 +331,59 @@ export default function CreateCampaignPage() {
       )}
 
       {step === "details" && (
-        <CampaignForm
-          title={title}
-          description={description}
-          goalAmount={goalAmount}
-          utilityType={utilityType}
-          utilityProvider={utilityProvider}
-          amountDue={amountDue}
-          shutoffDate={shutoffDate}
-          onTitleChange={setTitle}
-          onDescriptionChange={setDescription}
-          onGoalAmountChange={setGoalAmount}
-          onUtilityTypeChange={setUtilityType}
-          onUtilityProviderChange={setUtilityProvider}
-          onAmountDueChange={setAmountDue}
-          onShutoffDateChange={setShutoffDate}
-        />
+        <div className="space-y-4">
+          {billSubmissionId && userBills && (
+            <Card className="border-green-200 bg-green-50">
+              <CardContent className="p-4 flex items-center gap-3">
+                <CheckCircle className="size-5 text-green-600 shrink-0" />
+                <div>
+                  <p className="font-medium text-green-900">
+                    ✓ Bill linked and form prefilled
+                  </p>
+                  <p className="text-sm text-green-800">
+                    {userBills.find((b) => b._id === billSubmissionId) && (
+                      <>
+                        {userBills.find((b) => b._id === billSubmissionId)!.utilityType.charAt(0).toUpperCase() + 
+                         userBills.find((b) => b._id === billSubmissionId)!.utilityType.slice(1)} - {userBills.find((b) => b._id === billSubmissionId)!.utilityProvider} (${userBills.find((b) => b._id === billSubmissionId)!.amountDue.toFixed(2)})
+                      </>
+                    )}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setBillSubmissionId(null);
+                    setUtilityType(null);
+                    setUtilityProvider("");
+                    setAmountDue("");
+                    setShutoffDate("");
+                    setGoalAmount("");
+                  }}
+                  className="ml-auto"
+                >
+                  Change Bill
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+          <CampaignForm
+            title={title}
+            description={description}
+            goalAmount={goalAmount}
+            utilityType={utilityType}
+            utilityProvider={utilityProvider}
+            amountDue={amountDue}
+            shutoffDate={shutoffDate}
+            onTitleChange={setTitle}
+            onDescriptionChange={setDescription}
+            onGoalAmountChange={setGoalAmount}
+            onUtilityTypeChange={setUtilityType}
+            onUtilityProviderChange={setUtilityProvider}
+            onAmountDueChange={setAmountDue}
+            onShutoffDateChange={setShutoffDate}
+          />
+        </div>
       )}
 
       {step === "type" && (
@@ -355,6 +415,17 @@ export default function CreateCampaignPage() {
         />
       )}
 
+      {step === "image" && (
+        <CampaignImageUploader
+          imageStorageId={heroImageStorageId}
+          imagePreviewUrl={heroImagePreviewUrl}
+          onImageChange={(storageId, previewUrl) => {
+            setHeroImageStorageId(storageId);
+            setHeroImagePreviewUrl(previewUrl);
+          }}
+        />
+      )}
+
       {step === "preview" && campaignType && utilityType && (
         <CampaignPreview
           title={title}
@@ -368,6 +439,7 @@ export default function CreateCampaignPage() {
           showRecipientName={showRecipientName}
           showRecipientLocation={showRecipientLocation}
           showBillDetails={showBillDetails}
+          imagePreviewUrl={heroImagePreviewUrl}
         />
       )}
 

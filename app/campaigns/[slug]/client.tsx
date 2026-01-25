@@ -40,11 +40,21 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
 
   const [isProcessingDonation, setIsProcessingDonation] = React.useState(false);
   const donateSectionRef = React.useRef<HTMLDivElement | null>(null);
-  const [heroImage, setHeroImage] = React.useState(
-    "/Screenshot%202026-01-25%20at%2012.19.44%E2%80%AFPM.png"
-  );
+  const [heroImage, setHeroImage] = React.useState<string | null>(null);
   const [shareCopied, setShareCopied] = React.useState(false);
   const [shareOpen, setShareOpen] = React.useState(false);
+
+  const DEFAULT_CAMPAIGN_IMAGE = "/default-campaign-image.png";
+
+  // Set hero image from campaign or use fallback
+  React.useEffect(() => {
+    if (campaign?.heroImageUrl) {
+      setHeroImage(campaign.heroImageUrl);
+    } else {
+      // Use default fallback from public folder
+      setHeroImage(DEFAULT_CAMPAIGN_IMAGE);
+    }
+  }, [campaign?.heroImageUrl]);
 
   if (campaign === undefined || donations === undefined) {
     return (
@@ -204,14 +214,10 @@ export function PublicCampaignPageClient({ slug }: PublicCampaignPageClientProps
               <div className="aspect-[4/3] bg-slate-100">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={heroImage}
+                  src={heroImage || ""}
                   alt="Community relief"
                   className="h-full w-full object-cover"
-                  onError={() =>
-                    setHeroImage(
-                      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1400&q=80"
-                    )
-                  }
+                  onError={() => setHeroImage(DEFAULT_CAMPAIGN_IMAGE)}
                 />
               </div>
               <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-sm font-medium text-slate-700 shadow-sm">

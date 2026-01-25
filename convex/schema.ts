@@ -205,7 +205,7 @@ export default defineSchema({
   campaigns: defineTable({
     // Campaign owner (recipient)
     userId: v.id("users"),
-    billSubmissionId: v.union(v.id("billSubmissions"), v.null()), // Optional: link to existing bill
+    billSubmissionId: v.id("billSubmissions"), // Required: link to existing bill
     
     // Campaign metadata
     title: v.string(),
@@ -238,6 +238,13 @@ export default defineSchema({
     showRecipientLocation: v.boolean(), // For anonymous: may show city only
     showBillDetails: v.boolean(), // For anonymous: may hide account numbers
     
+    // Campaign images
+    heroImageStorageId: v.optional(v.string()), // Convex storage ID for hero image
+    heroImageUrl: v.optional(v.string()), // Cached URL for display
+    
+    // Bill validation
+    billValidatedAt: v.number(), // Timestamp when bill was validated at campaign creation
+    
     // Campaign stats
     donationCount: v.number(),
     lastDonationAt: v.union(v.number(), v.null()),
@@ -256,6 +263,9 @@ export default defineSchema({
   campaignDonations: defineTable({
     campaignId: v.id("campaigns"),
     
+    // Link donation to the associated bill
+    linkedBillId: v.id("billSubmissions"), // Copied from campaign.billSubmissionId
+    
     // Donor information
     donorUserId: v.union(v.id("users"), v.null()), // Null for guest donations
     donorEmail: v.string(), // Required for receipt
@@ -273,6 +283,12 @@ export default defineSchema({
       v.literal("failed"),
       v.literal("refunded")
     ),
+    
+    // Donation source
+    donationSource: v.union(v.literal("direct"), v.literal("pool")),
+    
+    // Approver for pool-based donations (if applicable)
+    approverId: v.optional(v.id("users")),
     
     // Message (optional)
     message: v.union(v.string(), v.null()),
