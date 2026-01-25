@@ -6,6 +6,8 @@ const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/api/clerk/webhook(.*)",
+  "/campaigns(.*)",
+  "/api/stripe/campaign-donation(.*)",
 ]);
 
 // Define routes that require onboarding to be completed

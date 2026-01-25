@@ -185,3 +185,93 @@ export const getPaymentStats = query({
     };
   },
 });
+
+/**
+ * Process payment from campaign funds
+ */
+export const processCampaignPayment = mutation({
+  args: {
+    campaignId: v.id("campaigns"),
+    billSubmissionId: v.id("billSubmissions"),
+    processedBy: v.id("users"),
+    paymentMethod: v.union(
+      v.literal("cheque"),
+      v.literal("bank_transfer"),
+      v.literal("online")
+    ),
+    confirmationNumber: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Verify campaign exists and is completed
+    const campaign = await ctx.db.get(args.campaignId);
+    if (!campaign) {
+      throw new Error("Campaign not found");
+    }
+
+    if (!campaign.isCompleted) {
+      throw new Error("Campaign must be completed before processing payment");
+    }
+
+    // Verify bill exists and is linked to campaign
+    const bill = await ctx.db.get(args.billSubmissionId);
+    if (!bill) {
+      throw new Error("Bill submission not found");
+    }
+
+    if (bill.paymentStatus === "paid") {
+      throw new Error("Bill has already been paid");
+    }
+
+    // Verify campaign has sufficient funds
+    if (campaign.currentAmount < bill.amountDue) {
+      throw new Error("Campaign does not have sufficient funds");
+    }
+
+    // Get pool for the bill
+    const pool = await ctx.db.get(bill.poolId);
+    if (!pool) {
+      throw new Error("Pool not found");
+    }
+
+    const now = Date.now();
+    const paymentAmount = Math.min(campaign.currentAmount, bill.amountDue);
+
+    // Create payment record
+    const paymentId = await ctx.db.insert("payments", {
+      billSubmissionId: args.billSubmissionId,
+      poolId: bill.poolId,
+      amount: paymentAmount,
+      utilityProvider: bill.utilityProvider,
+      paymentMethod: args.paymentMethod,
+      processedBy: args.processedBy,
+      processedAt: now,
+      confirmationNumber: args.confirmationNumber ?? null,
+      createdAt: now,
+    });
+
+    // Update bill submission
+    await ctx.db.patch(args.billSubmissionId, {
+      paymentStatus: "paid",
+      paymentAmount: paymentAmount,
+      paidAt: now,
+      paymentReference: args.confirmationNumber ?? null,
+      updatedAt: now,
+    });
+
+    // Deduct from campaign (mark as used)
+    await ctx.db.patch(args.campaignId, {
+      currentAmount: campaign.currentAmount - paymentAmount,
+      updatedAt: now,
+    });
+
+    // Update pool (if campaign funds are being added to pool)
+    // Note: In this implementation, campaign funds go directly to utility
+    // If you want to add them to pool first, uncomment below:
+    // await ctx.db.patch(bill.poolId, {
+    //   totalFundsAvailable: pool.totalFundsAvailable + paymentAmount,
+    //   updatedAt: now,
+    // });
+
+    return paymentId;
+  },
+});

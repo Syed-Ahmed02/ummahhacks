@@ -201,4 +201,88 @@ export default defineSchema({
   })
     .index("by_poolId", ["poolId"])
     .index("by_weekStartDate", ["weekStartDate"]),
+
+  campaigns: defineTable({
+    // Campaign owner (recipient)
+    userId: v.id("users"),
+    billSubmissionId: v.union(v.id("billSubmissions"), v.null()), // Optional: link to existing bill
+    
+    // Campaign metadata
+    title: v.string(),
+    description: v.string(),
+    goalAmount: v.number(),
+    currentAmount: v.number(),
+    currency: v.literal("CAD"), // Canadian dollars
+    
+    // Campaign type and visibility
+    campaignType: v.union(v.literal("public"), v.literal("anonymous")),
+    isActive: v.boolean(),
+    isCompleted: v.boolean(),
+    
+    // Shareable link
+    shareableSlug: v.string(), // Unique URL slug (e.g., "help-john-keep-lights-on")
+    
+    // Utility bill context (for anonymous campaigns, this may be partially hidden)
+    utilityType: v.union(
+      v.literal("electric"),
+      v.literal("water"),
+      v.literal("gas"),
+      v.literal("heating")
+    ),
+    utilityProvider: v.string(),
+    amountDue: v.number(),
+    shutoffDate: v.number(),
+    
+    // Privacy settings
+    showRecipientName: v.boolean(), // For anonymous: false
+    showRecipientLocation: v.boolean(), // For anonymous: may show city only
+    showBillDetails: v.boolean(), // For anonymous: may hide account numbers
+    
+    // Campaign stats
+    donationCount: v.number(),
+    lastDonationAt: v.union(v.number(), v.null()),
+    
+    // Timestamps
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    completedAt: v.union(v.number(), v.null()),
+  })
+    .index("by_userId", ["userId"])
+    .index("by_shareableSlug", ["shareableSlug"])
+    .index("by_campaignType", ["campaignType"])
+    .index("by_isActive", ["isActive"])
+    .index("by_billSubmissionId", ["billSubmissionId"]),
+
+  campaignDonations: defineTable({
+    campaignId: v.id("campaigns"),
+    
+    // Donor information
+    donorUserId: v.union(v.id("users"), v.null()), // Null for guest donations
+    donorEmail: v.string(), // Required for receipt
+    donorName: v.union(v.string(), v.null()), // Optional, may be anonymous
+    isAnonymousDonation: v.boolean(), // Donor chooses to remain anonymous
+    
+    // Payment details
+    amount: v.number(),
+    currency: v.literal("CAD"),
+    stripePaymentIntentId: v.string(),
+    stripeCustomerId: v.union(v.string(), v.null()),
+    paymentStatus: v.union(
+      v.literal("pending"),
+      v.literal("succeeded"),
+      v.literal("failed"),
+      v.literal("refunded")
+    ),
+    
+    // Message (optional)
+    message: v.union(v.string(), v.null()),
+    
+    // Timestamps
+    createdAt: v.number(),
+    paidAt: v.union(v.number(), v.null()),
+  })
+    .index("by_campaignId", ["campaignId"])
+    .index("by_donorUserId", ["donorUserId"])
+    .index("by_paymentStatus", ["paymentStatus"])
+    .index("by_stripePaymentIntentId", ["stripePaymentIntentId"]),
 });
