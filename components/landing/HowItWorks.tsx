@@ -5,7 +5,7 @@ const steps = [
     step: 1,
     title: "Subscribe Weekly",
     description:
-      "Choose how much you want to contribute each week. Starting at $5/week, you can pause or cancel anytime.",
+      "Choose how much you want to contribute each week. Starting at $1/week, you can pause or cancel anytime.",
   },
   {
     step: 2,

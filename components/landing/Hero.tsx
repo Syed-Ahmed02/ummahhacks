@@ -11,9 +11,17 @@ export function Hero() {
         aria-labelledby="hero-heading"
       >
       <div className="mx-auto max-w-4xl text-center">
-        <p className="text-muted-foreground mb-6 text-xs font-medium uppercase tracking-[0.2em]">
+        <p className="text-muted-foreground mb-4 text-xs font-medium uppercase tracking-[0.2em]">
           Neighborhood utility insurance
         </p>
+        <div className="mx-auto mb-6 flex flex-wrap items-center justify-center gap-2 text-xs">
+          <span className="rounded-full border border-border px-3 py-1 text-muted-foreground">
+            For contributors
+          </span>
+          <span className="rounded-full border border-border px-3 py-1 text-muted-foreground">
+            For neighbors who need help
+          </span>
+        </div>
         <h1
           id="hero-heading"
           className="font-semibold tracking-tight text-foreground text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
@@ -21,7 +29,7 @@ export function Hero() {
           Keep Your Neighbors&apos; Lights On
         </h1>
         <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg sm:text-xl">
-          Subscribe weekly. When a neighbor can&apos;t pay their utility bill, our AI verifies the need and we pay the provider directly. No cash is exchanged.
+          Subscribe weekly. When a neighbor can&apos;t pay their utility bill, we verify the request and pay the provider directly. No cash is exchanged.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Button render={<Link href="/subscribe" />} nativeButton={false} size="lg" className="gap-2 text-base">
@@ -29,9 +37,12 @@ export function Hero() {
             <ArrowRight className="size-4" aria-hidden />
           </Button>
           <Button render={<Link href="/submit-bill" />} nativeButton={false} variant="outline" size="lg" className="text-base">
-            I Need Help
+            Need help with a bill?
           </Button>
         </div>
+        <p className="text-muted-foreground mt-4 text-sm">
+          Donors support the pool. Recipients submit a bill for review.
+        </p>
       </div>
     </section>
   );

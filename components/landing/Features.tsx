@@ -58,6 +58,11 @@ export function Features() {
         <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-center text-lg">
           Built to be trusted. Built to be fair. Built to actually help.
         </p>
+        <div className="mx-auto mt-6 flex max-w-3xl flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground">
+          <span className="rounded-full border border-border px-3 py-1">Bills paid each week</span>
+          <span className="rounded-full border border-border px-3 py-1">Total dollars distributed</span>
+          <span className="rounded-full border border-border px-3 py-1">Cities served</span>
+        </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map(({ title, description, icon: Icon }) => (
             <Card key={title} className="border-border/80">

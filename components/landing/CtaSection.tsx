@@ -15,15 +15,15 @@ export function CtaSection() {
           id="cta-heading"
           className="font-semibold tracking-tight text-foreground text-center text-2xl sm:text-3xl"
         >
-          Ready to make a difference?
+          Choose your path
         </h2>
         <p className="text-muted-foreground mt-4 text-center text-lg max-w-2xl mx-auto">
-          Whether you want to help keep your neighbors&apos; lights on or you&apos;re struggling with a utility bill, we&apos;re here for you.
+          If you want to contribute, start a weekly subscription. If you need help, submit a utility bill for review.
         </p>
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2 max-w-3xl mx-auto">
           {/* Contributor CTA */}
-          <div className="rounded-xl border border-border bg-background p-8 text-center">
+          <div className="rounded-xl border border-foreground/30 bg-background p-8 text-center shadow-sm">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-border">
               <HandHeart className="text-foreground size-7" aria-hidden />
             </div>
@@ -39,7 +39,7 @@ export function CtaSection() {
               size="lg"
               className="mt-6 w-full gap-2"
             >
-              Start Contributing
+              Start contributing
               <ArrowRight className="size-4" aria-hidden />
             </Button>
           </div>
@@ -62,7 +62,7 @@ export function CtaSection() {
               size="lg"
               className="mt-6 w-full gap-2"
             >
-              Request Assistance
+              Request assistance
               <ArrowRight className="size-4" aria-hidden />
             </Button>
           </div>

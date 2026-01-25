@@ -1,6 +1,8 @@
 "use client";
 
-import { Receipt, DollarSign, CheckCircle } from "lucide-react";
+import Link from "next/link";
+import { Receipt, DollarSign, CheckCircle, BarChart3 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const reasons = [
   {
@@ -20,9 +22,16 @@ const reasons = [
   {
     title: "Why AI verification?",
     description:
-      "Our AI checks for duplicate bills, suspicious patterns, and verifies bill authenticity. Human admins review edge cases. Together, they stop fraud before it happens.",
+      "Our AI checks for duplicate bills, suspicious patterns, and verifies bill authenticity. Human admins review edge cases and users can appeal.",
     icon: CheckCircle,
-    highlights: ["Duplicate detection", "Pattern analysis", "Human oversight"],
+    highlights: ["Duplicate detection", "Pattern analysis", "Human oversight + appeals"],
+  },
+  {
+    title: "Weekly public reports",
+    description:
+      "We publish weekly reports with totals by utility type and city so you can see where funds go.",
+    icon: BarChart3,
+    highlights: ["Totals by utility", "City breakdowns", "Weekly updates"],
   },
 ];
 
@@ -42,7 +51,7 @@ export function TrustSection() {
         <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-center text-lg">
           We designed this system to earn skeptics&apos; trust. Here&apos;s why it works.
         </p>
-        <div className="mt-12 grid gap-8 lg:grid-cols-3">
+        <div className="mt-12 grid gap-8 sm:grid-cols-2">
           {reasons.map(({ title, description, icon: Icon, highlights }) => (
             <div key={title} className="rounded-xl border border-border bg-background p-6">
               <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border">
@@ -67,6 +76,11 @@ export function TrustSection() {
               </ul>
             </div>
           ))}
+        </div>
+        <div className="mt-10 flex justify-center">
+          <Button render={<Link href="/reports" />} nativeButton={false} variant="outline">
+            View weekly reports
+          </Button>
         </div>
       </div>
     </section>

@@ -20,7 +20,15 @@ export function LandingHeader() {
         >
           Community Invest
         </Link>
-        <nav aria-label="Main navigation" className="flex items-center gap-3">
+        <nav aria-label="Main navigation" className="flex items-center gap-2 sm:gap-3">
+          <Button
+            render={<Link href="/subscribe" />}
+            nativeButton={false}
+            size="sm"
+            className="sm:hidden"
+          >
+            Start
+          </Button>
           <div className="hidden items-center gap-4 sm:flex">
             <Link
               href="#how-it-works"
