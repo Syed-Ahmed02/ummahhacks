@@ -90,13 +90,17 @@ export default function DashboardLayout({
           </Link>
         </div>
         <div className="hidden flex-1 overflow-y-auto p-3 md:block">
-          <DashboardNav isAdmin={isAdmin} />
+          <DashboardNav role={convexUser?.role ?? null} isAdmin={isAdmin} />
         </div>
       </aside>
       <div className="flex flex-1 flex-col">
         <header className="border-border sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-background px-4 md:px-6">
           <nav className="md:hidden flex-1 overflow-x-auto">
-            <DashboardNav isAdmin={isAdmin} className="flex flex-row gap-1" />
+            <DashboardNav
+              role={convexUser?.role ?? null}
+              isAdmin={isAdmin}
+              className="flex flex-row gap-1"
+            />
           </nav>
           <div className="shrink-0 md:ml-auto">
             <Header user={user} showLogo={false} onSignOut={() => signOut()} />

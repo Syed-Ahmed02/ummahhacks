@@ -13,6 +13,7 @@ import {
   Users,
   DollarSign,
   MapPin,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,7 +26,7 @@ type NavItem = {
 // Contributor navigation items
 const contributorNavItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/impact", label: "Impact Reports", icon: FileBarChart },
+  { href: "/reports", label: "Impact Reports", icon: FileBarChart },
   { href: "/subscription", label: "Subscription", icon: CreditCard },
   { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
@@ -33,6 +34,7 @@ const contributorNavItems: NavItem[] = [
 // Recipient navigation items
 const recipientNavItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/impact", label: "How it works", icon: HelpCircle },
   { href: "/my-requests", label: "My Requests", icon: FileText },
   { href: "/submit-bill", label: "Submit Bill", icon: Receipt },
   { href: "/dashboard/profile", label: "Profile", icon: User },
