@@ -323,3 +323,21 @@ export const getAllBills = query({
     return bills.sort((a, b) => a.shutoffDate - b.shutoffDate);
   },
 });
+
+/**
+ * Get user's bills (for campaign linking)
+ */
+// export const getUserBills = query({
+//   args: {
+//     userId: v.id("users"),
+//   },
+//   handler: async (ctx, args) => {
+//     const bills = await ctx.db
+//       .query("billSubmissions")
+//       .withIndex("by_userId", (q) => q.eq("userId", args.userId))
+//       .collect();
+    
+//     // Sort by most recent first
+//     return bills.sort((a, b) => b.createdAt - a.createdAt);
+//   },
+// });

@@ -37,6 +37,8 @@ const recipientNavItems: NavItem[] = [
   { href: "/impact", label: "How it works", icon: HelpCircle },
   { href: "/my-requests", label: "My Requests", icon: FileText },
   { href: "/submit-bill", label: "Submit Bill", icon: Receipt },
+  { href: "/my-campaigns", label: "My Campaigns", icon: FileText },
+  { href: "/my-campaigns/create", label: "Start Campaign", icon: DollarSign },
   { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
 

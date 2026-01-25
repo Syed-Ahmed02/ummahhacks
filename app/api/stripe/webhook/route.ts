@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 import Stripe from "stripe";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "@/convex/_generated/api";
+
+const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -201,6 +205,93 @@ export async function POST(request: NextRequest) {
           subscriptionId,
           amount: invoice.amount_due / 100,
         });
+        break;
+      }
+
+      // Campaign donation events
+      case "payment_intent.succeeded": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        
+        // Check if this is a campaign donation
+        if (paymentIntent.metadata?.type === "campaign_donation") {
+          const donation = await convex.query(
+            api.campaigns.getDonationByPaymentIntent,
+            {
+              stripePaymentIntentId: paymentIntent.id,
+            }
+          );
+
+          if (donation) {
+            await convex.mutation(api.campaigns.updateDonationStatus, {
+              donationId: donation._id,
+              paymentStatus: "succeeded",
+              stripePaymentIntentId: paymentIntent.id,
+            });
+
+            console.log("Campaign donation succeeded:", {
+              donationId: donation._id,
+              campaignId: donation.campaignId,
+              amount: paymentIntent.amount / 100,
+            });
+          }
+        }
+        break;
+      }
+
+      case "payment_intent.payment_failed": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        
+        // Check if this is a campaign donation
+        if (paymentIntent.metadata?.type === "campaign_donation") {
+          const donation = await convex.query(
+            api.campaigns.getDonationByPaymentIntent,
+            {
+              stripePaymentIntentId: paymentIntent.id,
+            }
+          );
+
+          if (donation) {
+            await convex.mutation(api.campaigns.updateDonationStatus, {
+              donationId: donation._id,
+              paymentStatus: "failed",
+              stripePaymentIntentId: paymentIntent.id,
+            });
+
+            console.log("Campaign donation failed:", {
+              donationId: donation._id,
+              campaignId: donation.campaignId,
+            });
+          }
+        }
+        break;
+      }
+
+      case "charge.refunded": {
+        const charge = event.data.object as Stripe.Charge;
+        const paymentIntentId = charge.payment_intent as string;
+
+        if (paymentIntentId) {
+          const donation = await convex.query(
+            api.campaigns.getDonationByPaymentIntent,
+            {
+              stripePaymentIntentId: paymentIntentId,
+            }
+          );
+
+          if (donation && donation.paymentStatus === "succeeded") {
+            await convex.mutation(api.campaigns.updateDonationStatus, {
+              donationId: donation._id,
+              paymentStatus: "refunded",
+              stripePaymentIntentId: paymentIntentId,
+            });
+
+            console.log("Campaign donation refunded:", {
+              donationId: donation._id,
+              campaignId: donation.campaignId,
+              amount: charge.amount_refunded / 100,
+            });
+          }
+        }
         break;
       }
 

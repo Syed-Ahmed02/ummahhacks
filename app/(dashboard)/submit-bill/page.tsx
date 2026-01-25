@@ -453,6 +453,20 @@ export default function SubmitBillPage() {
         </p>
       </div>
 
+      {/* Prompt to create a campaign */}
+      <Card className="mb-8 border-sky-200 bg-sky-50">
+        <CardContent className="p-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="font-medium">Want to raise funds publicly?</p>
+            <p className="text-sm text-slate-700">Create a campaign to share your story and get support faster.</p>
+          </div>
+          <Button onClick={() => router.push("/my-campaigns/create")}>
+            Start Campaign
+            <ArrowRight className="ml-2 size-4" />
+          </Button>
+        </CardContent>
+      </Card>
+
       {step !== "success" && (
         <div className="mb-8">
           <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
