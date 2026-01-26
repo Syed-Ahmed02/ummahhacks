@@ -7,8 +7,18 @@ import { api } from "@/convex/_generated/api";
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  return NextResponse.json(
+    { message: "Stripe webhook endpoint; send POST requests only." },
+    { status: 200 }
+  );
+}
+
 export async function POST(request: NextRequest) {
-  const body = await request.text();
+  const body = await (await request.blob()).text();
   const signature = (await headers()).get("stripe-signature");
 
   if (!signature) {
@@ -228,8 +238,8 @@ export async function POST(request: NextRequest) {
           subscription.status === "active"
             ? "active"
             : subscription.status === "paused"
-            ? "paused"
-            : "cancelled";
+              ? "paused"
+              : "cancelled";
 
         // Update subscription in Convex by Stripe ID
         try {
@@ -325,7 +335,7 @@ export async function POST(request: NextRequest) {
         // Handle payment intent success for one-time payments
         // This is a backup in case checkout.session.completed doesn't fire
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        
+
         // Check if this is a one-time donation that wasn't processed yet
         try {
           const existingDonation = await convex.query(
@@ -353,7 +363,7 @@ export async function POST(request: NextRequest) {
       case "payment_intent.payment_failed": {
         // Handle payment intent failure for one-time payments
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
-        
+
         try {
           const existingDonation = await convex.query(
             api.donations.getOneTimeDonationByPaymentIntentId,
