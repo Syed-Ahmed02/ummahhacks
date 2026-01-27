@@ -37,10 +37,10 @@ export const COLORS = {
 // Animation timing (in frames at 30fps)
 export const TIMING = {
   // Scene durations - each screenshot scene
-  sceneDefault: 60, // 2 seconds per scene
+  sceneDefault: 100, // 3.3 seconds per scene
 
   // Outro
-  outroScene: 60, // 2 seconds
+  outroScene: 90, // 3 seconds
 
   // Transition duration
   transitionDuration: 30, // 1 second

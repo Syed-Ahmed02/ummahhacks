@@ -22,11 +22,11 @@ export const ScreenshotScene: React.FC<ScreenshotSceneProps> = ({
 }) => {
   const frame = useCurrentFrame();
 
-  // Text visible for first 25 frames, then disappears instantly
-  const showText = frame < 25;
+  // Text visible for first 40 frames, then disappears instantly
+  const showText = frame < 40;
   
   // Image appears instantly after text disappears (no fade)
-  const showImage = frame >= 25;
+  const showImage = frame >= 40;
 
   // Static zoom - scale and origin based on zoomOrigin prop
   const scale = zoomOrigin ? 1.15 : 1;

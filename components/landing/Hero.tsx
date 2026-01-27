@@ -11,17 +11,7 @@ export function Hero() {
         aria-labelledby="hero-heading"
       >
       <div className="mx-auto max-w-4xl text-center">
-        <p className="text-muted-foreground mb-4 text-xs font-medium uppercase tracking-[0.2em] fade-up fade-up-1">
-          Neighborhood utility insurance
-        </p>
-        <div className="mx-auto mb-6 flex flex-wrap items-center justify-center gap-2 text-xs fade-up fade-up-2">
-          <span className="rounded-full border border-border px-3 py-1 text-muted-foreground">
-            For contributors
-          </span>
-          <span className="rounded-full border border-border px-3 py-1 text-muted-foreground">
-            For neighbors who need help
-          </span>
-        </div>
+      
         <h1
           id="hero-heading"
           className="font-semibold tracking-tight text-foreground text-3xl sm:text-4xl md:text-5xl lg:text-6xl fade-up fade-up-2"

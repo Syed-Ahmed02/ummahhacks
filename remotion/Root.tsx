@@ -124,6 +124,15 @@ export const RemotionRoot: React.FC = () => {
           width={SCREENSHOT_VIDEO_CONFIG.width}
           height={SCREENSHOT_VIDEO_CONFIG.height}
         />
+
+        <Composition
+          id="ScreenshotDemoVideo-16x9"
+          component={ScreenshotDemoVideo}
+          durationInFrames={screenshotDemoDuration}
+          fps={SCREENSHOT_VIDEO_CONFIG.fps}
+          width={1920}
+          height={1080}
+        />
       </Folder>
     </>
   );
