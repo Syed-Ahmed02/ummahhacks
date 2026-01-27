@@ -1,7 +1,5 @@
 import React from "react";
-import { AbsoluteFill } from "remotion";
-import { TransitionSeries, linearTiming } from "@remotion/transitions";
-import { fade } from "@remotion/transitions/fade";
+import { AbsoluteFill, Series } from "remotion";
 
 import { TIMING, SCREENSHOT_SCENES, COLORS } from "./constants";
 import { LandingScene } from "./LandingScene";
@@ -9,44 +7,31 @@ import { ScreenshotScene } from "./ScreenshotScene";
 import { OutroScene } from "./OutroScene";
 
 export const ScreenshotDemoVideo: React.FC = () => {
-  const transitionDuration = TIMING.transitionDuration;
-
   return (
     <AbsoluteFill style={{ backgroundColor: COLORS.background }}>
-      <TransitionSeries>
+      <Series>
         {/* Scene 1: Landing Page - special animation */}
-        <TransitionSeries.Sequence durationInFrames={TIMING.sceneDefault}>
+        <Series.Sequence durationInFrames={TIMING.sceneDefault}>
           <LandingScene />
-        </TransitionSeries.Sequence>
-
-        <TransitionSeries.Transition
-          presentation={fade()}
-          timing={linearTiming({ durationInFrames: transitionDuration })}
-        />
+        </Series.Sequence>
 
         {/* Screenshot Scenes - payment, campaign, review, verification */}
         {SCREENSHOT_SCENES.map((scene) => (
-          <React.Fragment key={scene.id}>
-            <TransitionSeries.Sequence durationInFrames={TIMING.sceneDefault}>
-              <ScreenshotScene
-                image={scene.image}
-                title={scene.title}
-                subtitle={scene.subtitle}
-              />
-            </TransitionSeries.Sequence>
-
-            <TransitionSeries.Transition
-              presentation={fade()}
-              timing={linearTiming({ durationInFrames: transitionDuration })}
+          <Series.Sequence key={scene.id} durationInFrames={TIMING.sceneDefault}>
+            <ScreenshotScene
+              image={scene.image}
+              title={scene.title}
+              subtitle={scene.subtitle}
+              zoomOrigin={scene.zoomOrigin}
             />
-          </React.Fragment>
+          </Series.Sequence>
         ))}
 
         {/* Outro Scene */}
-        <TransitionSeries.Sequence durationInFrames={TIMING.outroScene}>
+        <Series.Sequence durationInFrames={TIMING.outroScene}>
           <OutroScene />
-        </TransitionSeries.Sequence>
-      </TransitionSeries>
+        </Series.Sequence>
+      </Series>
     </AbsoluteFill>
   );
 };
@@ -57,11 +42,6 @@ export const calculateScreenshotDemoDuration = () => {
   const screenshotFrames = SCREENSHOT_SCENES.length * TIMING.sceneDefault;
   const outroFrames = TIMING.outroScene;
   
-  // Total scenes = landing + screenshots + outro
-  const totalScenes = 1 + SCREENSHOT_SCENES.length + 1;
-  
-  // Transitions happen between each scene (totalScenes - 1 transitions)
-  const totalTransitions = (totalScenes - 1) * TIMING.transitionDuration;
-  
-  return landingFrames + screenshotFrames + outroFrames - totalTransitions;
+  // No transitions, so total is just sum of all scenes
+  return landingFrames + screenshotFrames + outroFrames;
 };

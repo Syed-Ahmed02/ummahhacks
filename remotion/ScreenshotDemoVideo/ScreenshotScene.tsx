@@ -11,20 +11,26 @@ type ScreenshotSceneProps = {
   image: string;
   title: string;
   subtitle: string;
+  zoomOrigin?: "center" | "left"; // undefined = no zoom
 };
 
 export const ScreenshotScene: React.FC<ScreenshotSceneProps> = ({
   image,
   title,
   subtitle,
+  zoomOrigin,
 }) => {
   const frame = useCurrentFrame();
 
-  // Text visible for first 1 second (30 frames), then disappears instantly
-  const showText = frame < 30;
+  // Text visible for first 25 frames, then disappears instantly
+  const showText = frame < 25;
   
   // Image appears instantly after text disappears (no fade)
-  const showImage = frame >= 30;
+  const showImage = frame >= 25;
+
+  // Static zoom - scale and origin based on zoomOrigin prop
+  const scale = zoomOrigin ? 1.15 : 1;
+  const transformOrigin = zoomOrigin === "left" ? "left center" : "center center";
 
   return (
     <AbsoluteFill
@@ -136,6 +142,8 @@ export const ScreenshotScene: React.FC<ScreenshotSceneProps> = ({
                   width: "100%",
                   height: "100%",
                   objectFit: "contain",
+                  transform: `scale(${scale})`,
+                  transformOrigin: transformOrigin,
                 }}
               />
             </div>

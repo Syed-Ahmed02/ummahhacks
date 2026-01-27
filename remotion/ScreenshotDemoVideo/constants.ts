@@ -37,10 +37,10 @@ export const COLORS = {
 // Animation timing (in frames at 30fps)
 export const TIMING = {
   // Scene durations - each screenshot scene
-  sceneDefault: 150, // 5 seconds per scene
+  sceneDefault: 60, // 2 seconds per scene
 
   // Outro
-  outroScene: 120, // 4 seconds
+  outroScene: 60, // 2 seconds
 
   // Transition duration
   transitionDuration: 30, // 1 second
@@ -60,6 +60,7 @@ type ScreenshotScene = {
   image: string;
   title: string;
   subtitle: string;
+  zoomOrigin?: "center" | "left";
 };
 
 // Screenshot scenes configuration (excluding landing - it has its own component)
@@ -69,6 +70,7 @@ export const SCREENSHOT_SCENES: ScreenshotScene[] = [
     image: "remotion/stripe_payment.png",
     title: "Subscribe Weekly",
     subtitle: "Secure Stripe Payments",
+    zoomOrigin: "center",
   },
   {
     id: "campaign",
@@ -81,6 +83,7 @@ export const SCREENSHOT_SCENES: ScreenshotScene[] = [
     image: "remotion/bill_review_page.png",
     title: "Every Request",
     subtitle: "Carefully Reviewed",
+    zoomOrigin: "left",
   },
   {
     id: "verification",
@@ -94,5 +97,4 @@ export const SCREENSHOT_SCENES: ScreenshotScene[] = [
 export const OUTRO_CONTENT = {
   title: "Join Today",
   subtitle: "Start making a difference",
-  cta: "communityinvest.ca",
 };
