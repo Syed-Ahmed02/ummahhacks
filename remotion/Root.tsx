@@ -10,6 +10,11 @@ import {
 } from "remotion";
 import { VIDEO_CONFIG, TIMING } from "./DemoVideo/constants";
 import { DemoVideo } from "./DemoVideo";
+import {
+  ScreenshotDemoVideo,
+  calculateScreenshotDemoDuration,
+} from "./ScreenshotDemoVideo";
+import { VIDEO_CONFIG as SCREENSHOT_VIDEO_CONFIG } from "./ScreenshotDemoVideo/constants";
 
 // Very simple test component to verify Remotion works
 const SimpleTest: React.FC = () => {
@@ -88,6 +93,7 @@ const calculateTotalDuration = () => {
 
 export const RemotionRoot: React.FC = () => {
   const totalDuration = calculateTotalDuration();
+  const screenshotDemoDuration = calculateScreenshotDemoDuration();
 
   return (
     <>
@@ -108,6 +114,15 @@ export const RemotionRoot: React.FC = () => {
           fps={VIDEO_CONFIG.fps}
           width={VIDEO_CONFIG.width}
           height={VIDEO_CONFIG.height}
+        />
+
+        <Composition
+          id="ScreenshotDemoVideo"
+          component={ScreenshotDemoVideo}
+          durationInFrames={screenshotDemoDuration}
+          fps={SCREENSHOT_VIDEO_CONFIG.fps}
+          width={SCREENSHOT_VIDEO_CONFIG.width}
+          height={SCREENSHOT_VIDEO_CONFIG.height}
         />
       </Folder>
     </>
