@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { ModeToggle } from "@/components/theme-toggle";
 
 export function LandingHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,6 +22,7 @@ export function LandingHeader() {
           Community Invest
         </Link>
         <nav aria-label="Main navigation" className="flex items-center gap-2 sm:gap-3">
+          <ModeToggle />
           <Button
             render={<Link href="/subscribe" />}
             nativeButton={false}
